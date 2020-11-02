@@ -21,8 +21,28 @@
     <ClInclude Include="__vm\.DisplayTest_SSD1306.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="definetest.h">
+    <ClInclude Include="Max_SSD1306.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TwoMaxWire.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glcdfont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="twi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Max_SSD1306.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TwoMaxWire.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="twi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

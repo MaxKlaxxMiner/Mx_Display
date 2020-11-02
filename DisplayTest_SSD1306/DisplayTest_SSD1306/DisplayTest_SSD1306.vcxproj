@@ -112,8 +112,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="definetest.h" />
+    <ClInclude Include="glcdfont.h" />
+    <ClInclude Include="Max_SSD1306.h" />
+    <ClInclude Include="twi.h" />
+    <ClInclude Include="TwoMaxWire.h" />
     <ClInclude Include="__vm\.DisplayTest_SSD1306.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Max_SSD1306.cpp" />
+    <ClCompile Include="twi.cpp" />
+    <ClCompile Include="TwoMaxWire.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
