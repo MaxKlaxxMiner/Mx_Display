@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>xml;json;txt;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{2a5fbcf1-ba52-4188-a322-d2d0b03c8caa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DisplayTest_ILI9341.ino" />
@@ -21,5 +24,37 @@
     <ClInclude Include="__vm\.DisplayTest_ILI9341.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mx_Display_AdafruitWrapper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mx_Display_Console.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mx_Display_ILI9341.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mx_Display_Scrollable.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Mx_Basics.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Mx_Display_Console_Core.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Mx_Display_ILI9341_Consts.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Mx_Display_ILI9341_Core.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Mx_Display_ILI9341.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Mx_Basics.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
