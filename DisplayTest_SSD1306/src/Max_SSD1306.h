@@ -2,7 +2,7 @@
 #define _MAX_SSD1306_h
 
 #include "arduino.h"
-#include "TwoMaxWire.h"
+#include "core/TwoMaxWire.h"
 
 #define WIRE_MAX 64
 

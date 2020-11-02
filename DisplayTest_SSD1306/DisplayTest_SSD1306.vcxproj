@@ -59,16 +59,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="glcdfont.h" />
-    <ClInclude Include="Max_SSD1306.h" />
-    <ClInclude Include="twi.h" />
-    <ClInclude Include="TwoMaxWire.h" />
+    <ClInclude Include="src\core\glcdfont.h" />
+    <ClInclude Include="src\core\twi.h" />
+    <ClInclude Include="src\core\TwoMaxWire.h" />
+    <ClInclude Include="src\Max_SSD1306.h" />
     <ClInclude Include="__vm\.DisplayTest_SSD1306.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Max_SSD1306.cpp" />
-    <ClCompile Include="twi.cpp" />
-    <ClCompile Include="TwoMaxWire.cpp" />
+    <ClCompile Include="src\core\twi.cpp" />
+    <ClCompile Include="src\core\TwoMaxWire.cpp" />
+    <ClCompile Include="src\Max_SSD1306.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,5 @@
 #include <avr/pgmspace.h>
-#include "glcdfont.h"
+#include "core/glcdfont.h"
 #include "Max_SSD1306.h"
 
 Max_SSD1306::Max_SSD1306(TwoMaxWire* twi) : wire(twi ? twi : &MaxWire), buffer(NULL) {}

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>xml;json;txt;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{30af00bf-eae2-48f5-bba1-c28de6d8e1da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{b7ca93d7-95c5-45ff-8f5b-4f625e27dca4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DisplayTest_SSD1306.ino" />
@@ -21,28 +27,28 @@
     <ClInclude Include="__vm\.DisplayTest_SSD1306.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Max_SSD1306.h">
+    <ClInclude Include="src\Max_SSD1306.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TwoMaxWire.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\core\glcdfont.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="glcdfont.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\core\twi.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="twi.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\core\TwoMaxWire.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Max_SSD1306.cpp">
+    <ClCompile Include="src\Max_SSD1306.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TwoMaxWire.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\core\TwoMaxWire.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="twi.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\core\twi.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
