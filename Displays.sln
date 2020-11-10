@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayTest_SSD1306", "Disp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayTest_ILI9341", "DisplayTest_ILI9341\DisplayTest_ILI9341.vcxproj", "{920EEE39-3C9C-4C60-A6E5-FA5256570DA1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mx_Display_Lib", "Mx_Display_Lib\Mx_Display_Lib.vcxproj", "{CF0009A2-DB5A-4AA7-B957-527940347543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,6 +23,10 @@ Global
 		{920EEE39-3C9C-4C60-A6E5-FA5256570DA1}.Debug|x86.Build.0 = Debug|Win32
 		{920EEE39-3C9C-4C60-A6E5-FA5256570DA1}.Release|x86.ActiveCfg = Release|Win32
 		{920EEE39-3C9C-4C60-A6E5-FA5256570DA1}.Release|x86.Build.0 = Release|Win32
+		{CF0009A2-DB5A-4AA7-B957-527940347543}.Debug|x86.ActiveCfg = Debug|Win32
+		{CF0009A2-DB5A-4AA7-B957-527940347543}.Debug|x86.Build.0 = Debug|Win32
+		{CF0009A2-DB5A-4AA7-B957-527940347543}.Release|x86.ActiveCfg = Release|Win32
+		{CF0009A2-DB5A-4AA7-B957-527940347543}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -123,9 +123,18 @@ void MxClassName::write8(uint8_t val)
   write8inline(val);
 }
 
+void MxClassName::writeStrobe()
+{
+  wrStrobeData();
+}
+
 uint8_t MxClassName::read8()
 {
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega2560__)
   asm volatile("rjmp .+0\n" ::);
+#else
+  delayDirect(1);
+#endif
   uint8_t val;
 #if defined(MxReference)
   val = digitalRead(_data0Pin) ? B00000001 : 0;
@@ -610,14 +619,14 @@ uint16_t MxClassName::height()
   return MxDisplayHeight;
 }
 
-void MxClassName::clear(uint16_t color = 0x0000)
+void MxClassName::clear(uint16_t color)
 {
   setWindow(0, 0, MxDisplayWidth - 1, MxDisplayHeight - 1);
   fillWindow(color, MxDisplayWidth / 2 * MxDisplayHeight);
   fillWindow(color, MxDisplayWidth / 2 * MxDisplayHeight);
 }
 
-void MxClassName::clearTrue(uint8_t colorR = 0, uint8_t colorG = 0, uint8_t colorB = 0)
+void MxClassName::clearTrue(uint8_t colorR, uint8_t colorG, uint8_t colorB)
 {
   fillRectTrue(0, 0, MxDisplayWidth, MxDisplayHeight, colorR, colorG, colorB);
 }
@@ -1404,7 +1413,7 @@ uint16_t MxClassName::getScanline()
   return (hi << 8) | lo;
 }
 
-void MxClassName::vSync(uint16_t line = 260)
+void MxClassName::vSync(uint16_t line)
 {
   for (; getScanline() > line;) {}
   for (; getScanline() <= line;) {}

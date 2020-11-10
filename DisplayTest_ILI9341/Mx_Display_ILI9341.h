@@ -66,16 +66,18 @@
   void fillWindowLineTrue(uint8_t colorR, uint8_t colorG, uint8_t colorB,                          \
                           uint8_t x, uint8_t y, bool horizontal, uint16_t len);                    \
                                                                                                    \
-private:                                                                                           \
-  void setWriteDir();                                                                              \
-  void setReadDir();                                                                               \
   void write8(uint8_t val);                                                                        \
-  void write8inline(uint8_t val);                                                                  \
-  uint8_t read8();                                                                                 \
+  void writeStrobe();                                                                              \
   void command(uint8_t cmd);                                                                       \
   void command(uint8_t cmd, uint8_t val);                                                          \
   void command(uint8_t cmd, uint8_t val1, uint8_t val2);                                           \
   void command16(uint8_t cmd, uint16_t val1, uint16_t val2);                                       \
+                                                                                                   \
+private:                                                                                           \
+  void setWriteDir();                                                                              \
+  void setReadDir();                                                                               \
+  void write8inline(uint8_t val);                                                                  \
+  uint8_t read8();                                                                                 \
   void rdIdle();                                                                                   \
   void rdActive();                                                                                 \
   void wrIdle();                                                                                   \
