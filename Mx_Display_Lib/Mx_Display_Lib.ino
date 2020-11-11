@@ -4,7 +4,7 @@
 
 int main()
 {
-  init(); // init vanilla-routines
+  //init(); // init vanilla-routines
   setup();
   for (;;) loop();
   return 0;

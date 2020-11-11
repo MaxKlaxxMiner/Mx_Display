@@ -4,13 +4,14 @@
 
 #if F_CPU > 20000
 
+#ifndef __DELAY_WAIT_1MS__
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega2560__)
 #define __DELAY_WAIT_1MS__ (F_CPU / 4000 - 3)
 #endif
-#if defined(__SAM3X8E__)
-#define __DELAY_WAIT_1MS__ (F_CPU / 5250 - 3)
+//#if defined(__SAM3X8E__)
+//#define __DELAY_WAIT_1MS__ (F_CPU / 5250 - 3)
+//#endif
 #endif
-
 #endif
 
 #ifdef __DELAY_WAIT_1MS__

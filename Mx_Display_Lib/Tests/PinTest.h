@@ -1,20 +1,28 @@
 
+#include <arduino.h>
+#define __DELAY_WAIT_1MS__ F_CPU / 4000 - 3
 #include "../Mx_Basics.h"
 
 // __attribute__((always_inline))
 
 void setup()
 {
-  pinModeDirect(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+  pinModeDirect(13, OUTPUT);
+  digitalWriteDirect(13, LOW);
+  pinModeDirect(12, OUTPUT);
+  //Serial.begin(9600);
 }
 
 void loop()
 {
-  digitalWriteDirect(LED_BUILTIN, HIGH);
-  delayDirect(50);
-  digitalWriteDirect(LED_BUILTIN, LOW);
-  delayDirect(950);
+  digitalWriteDirect(12, HIGH);
+  delayDirect(1);
+  asm volatile("nop\nnop\nnop\n");
+  asm volatile("nop\nnop\nnop\n");
+  digitalWriteDirect(12, LOW);
+  delayDirect(1);
+  asm volatile("nop\nnop\n");
+
 
   // --- measure ---
   //uint32_t m1 = micros();
