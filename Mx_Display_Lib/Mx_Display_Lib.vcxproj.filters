@@ -29,5 +29,9 @@
     <ClInclude Include="Core\PinDirect.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Mx_Display_Serial.h" />
+    <ClInclude Include="Tests\DisplayTestSerial1.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

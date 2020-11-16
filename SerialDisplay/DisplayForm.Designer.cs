@@ -1,6 +1,6 @@
 ﻿namespace SerialDisplay
 {
-  partial class DisplayForm
+  sealed partial class DisplayForm
   {
     /// <summary>
     /// Erforderliche Designervariable.
@@ -42,9 +42,11 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(680, 540);
+      this.ClientSize = new System.Drawing.Size(983, 623);
       this.Name = "DisplayForm";
       this.Text = "Form1";
+      this.Load += new System.EventHandler(this.DisplayForm_Load);
+      this.Resize += new System.EventHandler(this.DisplayForm_Resize);
       this.ResumeLayout(false);
 
     }
