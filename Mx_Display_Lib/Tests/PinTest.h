@@ -9,28 +9,20 @@ void setup()
 {
   pinModeDirect(13, OUTPUT);
   digitalWriteDirect(13, LOW);
-  pinModeDirect(12, OUTPUT);
   //Serial.begin(9600);
+  //Serial.begin(115200);
+  Serial.begin(2000000);
 }
 
 void loop()
 {
-  digitalWriteDirect(12, HIGH);
-  delayDirect(1);
-  asm volatile("nop\nnop\nnop\n");
-  asm volatile("nop\nnop\nnop\n");
-  digitalWriteDirect(12, LOW);
-  delayDirect(1);
-  asm volatile("nop\nnop\n");
-
-
-  // --- measure ---
-  //uint32_t m1 = micros();
-  //delay(10);
-  //m1 = micros() - m1;
-  //uint32_t m2 = micros();
-  //delayDirect(10);
-  //m2 = micros() - m2;
-  //Serial.print(m1); Serial.print(" - "); Serial.println(m2);
-  //delay(500);
+  //Serial.print("lol - ");
+  //Serial.println(millis());
+  //for (int i = 0; i < 256; i++)
+  //{
+  //  Serial.write((uint8_t)i);
+  //  Serial.write((uint8_t)(i >> 8));
+  //}
+  //Serial.println();
+  //delay(1000);
 }
