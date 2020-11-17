@@ -53,58 +53,58 @@ unsigned long testFillScreen()
 //  tft.println("see if I don't!");
 //  return micros() - start;
 //}
-//
-//unsigned long testLines(uint16_t color)
-//{
-//  unsigned long start, t;
-//  int x1, y1, x2, y2;
-//  int w = tft.width();
-//  int h = tft.height();
-//
-//  tft.fillScreen(BLACK);
-//
-//  x1 = y1 = 0;
-//  y2 = h - 1;
-//  start = micros();
-//  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  x2 = w - 1;
-//  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  t = micros() - start; // fillScreen doesn't count against timing
-//
-//  tft.fillScreen(BLACK);
-//
-//  x1 = w - 1;
-//  y1 = 0;
-//  y2 = h - 1;
-//  start = micros();
-//  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  x2 = 0;
-//  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  t += micros() - start;
-//
-//  tft.fillScreen(BLACK);
-//
-//  x1 = 0;
-//  y1 = h - 1;
-//  y2 = 0;
-//  start = micros();
-//  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  x2 = w - 1;
-//  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  t += micros() - start;
-//
-//  tft.fillScreen(BLACK);
-//
-//  x1 = w - 1;
-//  y1 = h - 1;
-//  y2 = 0;
-//  start = micros();
-//  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//  x2 = 0;
-//  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
-//
-//  return micros() - start;
-//}
+
+unsigned long testLines(uint16_t color)
+{
+  unsigned long start, t;
+  int x1, y1, x2, y2;
+  int w = tft.width();
+  int h = tft.height();
+
+  tft.fillScreen(BLACK);
+
+  x1 = y1 = 0;
+  y2 = h - 1;
+  start = micros();
+  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  x2 = w - 1;
+  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  t = micros() - start; // fillScreen doesn't count against timing
+
+  tft.fillScreen(BLACK);
+
+  x1 = w - 1;
+  y1 = 0;
+  y2 = h - 1;
+  start = micros();
+  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  x2 = 0;
+  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  t += micros() - start;
+
+  tft.fillScreen(BLACK);
+
+  x1 = 0;
+  y1 = h - 1;
+  y2 = 0;
+  start = micros();
+  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  x2 = w - 1;
+  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  t += micros() - start;
+
+  tft.fillScreen(BLACK);
+
+  x1 = w - 1;
+  y1 = h - 1;
+  y2 = 0;
+  start = micros();
+  for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  x2 = 0;
+  for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+
+  return micros() - start;
+}
 
 unsigned long testFastLines(uint16_t color1, uint16_t color2)
 {
@@ -292,8 +292,8 @@ void setup(void)
   //testText();
   //delay(3000);
 
-  //testLines(CYAN);
-  //delay(500);
+  testLines(CYAN);
+  delay(500);
 
   testFastLines(RED, BLUE);
   delay(500);

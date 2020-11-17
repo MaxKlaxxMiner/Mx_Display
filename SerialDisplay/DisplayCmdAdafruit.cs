@@ -35,17 +35,25 @@ namespace SerialDisplay
     enum CmdAdafruitType
     {
       /// <summary>
-      /// fills the entire screen with one colour [uint16_t color]
+      /// fills the entire screen with one colour
+      /// [uint16_t color]
       /// </summary>
       CmdFillScreen = 0x01,
       /// <summary>
-      /// fast drawing of a horizontal line [int16_t x, int16_t y, int16_t w, uint16_t color]
+      /// fast drawing of a horizontal line
+      /// [int16_t x, int16_t y, int16_t w, uint16_t color]
       /// </summary>
       CmdFastHLine = 0x02,
       /// <summary>
-      /// fast drawing of a vertical line [int16_t x, int16_t y, int16_t h, uint16_t color]
+      /// fast drawing of a vertical line
+      /// [int16_t x, int16_t y, int16_t h, uint16_t color]
       /// </summary>
       CmdFastVLine = 0x03,
+      /// <summary>
+      /// drawing normal line
+      /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color]
+      /// </summary>
+      CmdDrawLine = 0x04,
     }
 
     /// <summary>
@@ -60,6 +68,7 @@ namespace SerialDisplay
         case CmdAdafruitType.CmdFillScreen: return 1 + sizeof(ushort);
         case CmdAdafruitType.CmdFastHLine: return 1 + sizeof(ushort) * 4;
         case CmdAdafruitType.CmdFastVLine: return 1 + sizeof(ushort) * 4;
+        case CmdAdafruitType.CmdDrawLine: return 1 + sizeof(ushort) * 5;
         default: return 1; // unknown command
       }
     }
@@ -211,7 +220,7 @@ namespace SerialDisplay
         h += y;
         y = 0;
       }
-      if (y + h >currentHeight) // Clip bottom
+      if (y + h > currentHeight) // Clip bottom
       {
         h = currentHeight - y;
       }
@@ -241,6 +250,145 @@ namespace SerialDisplay
         x = y;
         y = Height - 1 - t;
         FastHLine(ptr + x + y * Width, h, color);
+      }
+    }
+    #endregion
+
+    #region # // --- DrawLine ---
+    /// <summary>
+    /// drawing normal line (safe-mode)
+    /// </summary>
+    /// <param name="ptr">pointer to the backbuffer (+start position)</param>
+    /// <param name="x1">start x-position</param>
+    /// <param name="y1">start y-position</param>
+    /// <param name="x2">end x-position</param>
+    /// <param name="y2">end y-position</param>
+    /// <param name="color">line-color</param>
+    static void DrawLineSafe(uint* ptr, int x1, int y1, int x2, int y2, uint color)
+    {
+      bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
+      if (steep) { int t = x1; x1 = y1; y1 = t; t = x2; x2 = y2; y2 = t; }
+      if (x1 > x2) { int t = x1; x1 = x2; x2 = t; t = y1; y1 = y2; y2 = t; }
+
+      int dx = x2 - x1;
+      int dy = Math.Abs(y2 - y1);
+      int err = dx / 2;
+      int ystep = y1 < y2 ? 1 : -1;
+
+      if (steep)
+      {
+        for (; x1 <= x2; x1++)
+        {
+          if ((uint)y1 < Width && (uint)x1 < Height) ptr[y1 + x1 * Width] = color;
+          err -= dy;
+          if (err < 0)
+          {
+            y1 += ystep;
+            err += dx;
+          }
+        }
+      }
+      else
+      {
+        for (; x1 <= x2; x1++)
+        {
+          if ((uint)x1 < Width && (uint)y1 < Height) ptr[x1 + y1 * Width] = color;
+          err -= dy;
+          if (err < 0)
+          {
+            y1 += ystep;
+            err += dx;
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// drawing normal line
+    /// </summary>
+    /// <param name="ptr">pointer to the backbuffer (+start position)</param>
+    /// <param name="x1">start x-position</param>
+    /// <param name="y1">start y-position</param>
+    /// <param name="x2">end x-position</param>
+    /// <param name="y2">end y-position</param>
+    /// <param name="color">line-color</param>
+    static void DrawLineFast(uint* ptr, int x1, int y1, int x2, int y2, uint color)
+    {
+      if ((uint)x1 < Width && (uint)y1 < Height && (uint)x2 < Width && (uint)y2 < Height)
+      {
+        bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
+        if (steep) { int t = x1; x1 = y1; y1 = t; t = x2; x2 = y2; y2 = t; }
+        if (x1 > x2) { int t = x1; x1 = x2; x2 = t; t = y1; y1 = y2; y2 = t; }
+
+        int dx = x2 - x1;
+        int dy = Math.Abs(y2 - y1);
+        int err = dx / 2;
+        int ystep = y1 < y2 ? 1 : -1;
+
+        if (steep)
+        {
+          var p = ptr + y1 + x1 * Width;
+          for (; x1 <= x2; x1++)
+          {
+            *p = color;
+            err -= dy;
+            p += Width;
+            if (err < 0)
+            {
+              p += ystep;
+              err += dx;
+            }
+          }
+        }
+        else
+        {
+          var p = ptr + x1 + y1 * Width;
+          ystep *= Width;
+          for (; x1 <= x2; x1++)
+          {
+            *p = color;
+            err -= dy;
+            p++;
+            if (err < 0)
+            {
+              err += dx;
+              p += ystep;
+            }
+          }
+        }
+      }
+      else
+      {
+        DrawLineSafe(ptr, x1, y1, x2, y2, color);
+      }
+    }
+
+    /// <summary>
+    /// drawing normal line
+    /// </summary>
+    /// <param name="ptr">pointer to the backbuffer (+start position)</param>
+    /// <param name="x1">start x-position</param>
+    /// <param name="y1">start y-position</param>
+    /// <param name="x2">end x-position</param>
+    /// <param name="y2">end y-position</param>
+    /// <param name="color">line-color</param>
+    static void DrawLine(uint* ptr, int x1, int y1, int x2, int y2, uint color)
+    {
+      if (currentRotation == 0)
+      {
+        DrawLineFast(ptr, x1, y1, x2, y2, color);
+      }
+      else if (currentRotation == 1)
+      {
+        DrawLineFast(ptr, Width - 1 - y1, x1, Width - 1 - y2, x2, color);
+      }
+      else if (currentRotation == 2)
+      {
+        DrawLineFast(ptr, Width - 1 - x1, Height - 1 - y1, Width - 1 - x2, Height - 1 - y2, color);
+      }
+      else
+      {
+        DrawLineFast(ptr, y1, Height - 1 - x1, y2, Height - 1 - x2, color);
       }
     }
     #endregion
@@ -282,6 +430,17 @@ namespace SerialDisplay
           ushort color = BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3);
           FastVLine(bitmapPtr, x, y, h, Color565ToArgb(color));
           return 1 + sizeof(ushort) * 4;
+        }
+
+        case CmdAdafruitType.CmdDrawLine:
+        {
+          int x1 = BitConverter.ToInt16(buffer, bufferOfs);
+          int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          ushort color = BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 4);
+          DrawLine(bitmapPtr, x1, y1, x2, y2, Color565ToArgb(color));
+          return 1 + sizeof(ushort) * 5;
         }
 
         default: return 1; // unknown command

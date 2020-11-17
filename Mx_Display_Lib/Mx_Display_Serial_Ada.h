@@ -12,16 +12,24 @@ enum CmdAdafruitType
 {
   /// <summary>
   /// fills the entire screen with one colour
+  /// [uint16_t color]
   /// </summary>
   CmdFillScreen = 0x01,
   /// <summary>
-  /// fast drawing of a horizontal line [int16_t x, int16_t y, int16_t w, uint16_t color]
+  /// fast drawing of a horizontal line
+  /// [int16_t x, int16_t y, int16_t w, uint16_t color]
   /// </summary>
   CmdFastHLine = 0x02,
   /// <summary>
-  /// fast drawing of a vertical line [int16_t x, int16_t y, int16_t h, uint16_t color]
+  /// fast drawing of a vertical line
+  /// [int16_t x, int16_t y, int16_t h, uint16_t color]
   /// </summary>
   CmdFastVLine = 0x03,
+  /// <summary>
+  /// drawing normal line
+  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color]
+  /// </summary>
+  CmdDrawLine = 0x04,
 };
 
 #define DisplaySerialPort Serial
@@ -39,6 +47,13 @@ enum CmdAdafruitType
                                            DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
                                            DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8)); \
                                            DisplaySerialPort.write((uint8_t)(val4)); DisplaySerialPort.write((uint8_t)((val4) >> 8));
+
+#define Cmd5w(cmd, val1, val2, val3, val4, val5) DisplaySerialPort.write((uint8_t)(cmd)); \
+                                                 DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
+                                                 DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
+                                                 DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8)); \
+                                                 DisplaySerialPort.write((uint8_t)(val4)); DisplaySerialPort.write((uint8_t)((val4) >> 8)); \
+                                                 DisplaySerialPort.write((uint8_t)(val5)); DisplaySerialPort.write((uint8_t)((val5) >> 8));
 
 class Mx_Display_Serial_Adafruit
 {
@@ -92,6 +107,19 @@ public:
   void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   {
     Cmd4w(CmdFastVLine, x, y, h, color);
+  }
+
+  /// <summary>
+  /// drawing normal line
+  /// </summary>
+  /// <param name="x1">start x-position</param>
+  /// <param name="y1">start y-position</param>
+  /// <param name="x2">end x-position</param>
+  /// <param name="y2">end y-position</param>
+  /// <param name="color">line-color</param>
+  void drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+  {
+    Cmd5w(CmdDrawLine, x1, y1, x2, y2, color);
   }
 
 private:
