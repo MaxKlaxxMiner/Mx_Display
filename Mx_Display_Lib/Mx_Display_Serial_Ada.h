@@ -20,6 +20,11 @@ enum CmdAdafruitType
   /// </summary>
   CmdFillScreen,
   /// <summary>
+  /// draw a pixel :)
+  /// [int16_t x, int16_t y, uint16_t color]
+  /// </summary>
+  CmdDrawPixel,
+  /// <summary>
   /// fast drawing of a horizontal line
   /// [int16_t x, int16_t y, int16_t w, uint16_t color]
   /// </summary>
@@ -40,6 +45,16 @@ enum CmdAdafruitType
   /// </summary>
   CmdDrawRect,
   /// <summary>
+  /// fill a rectangle completely with one color
+  /// [int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color]
+  /// </summary>
+  CmdFillRect,
+  /// <summary>
+  /// draw a circle outline
+  /// [int16_t x, int16_t y, int16_t r, uint16_t color]
+  /// </summary>
+  CmdDrawCircle,
+  /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
   /// </summary>
@@ -57,7 +72,7 @@ enum CmdAdafruitType
 };
 
 #define DisplaySerialPort Serial
-#define DisplaySerialName tft;
+//#define DisplaySerialName tft;
 #define DisplayWidth 320
 #define DisplayHeight 240
 
@@ -67,6 +82,11 @@ enum CmdAdafruitType
 
 #define Cmd1w(cmd, val1) DisplaySerialPort.write((uint8_t)(cmd)); \
                          DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8));
+
+#define Cmd3w(cmd, val1, val2, val3) DisplaySerialPort.write((uint8_t)(cmd)); \
+                                     DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
+                                     DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
+                                     DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8));
 
 #define Cmd4w(cmd, val1, val2, val3, val4) DisplaySerialPort.write((uint8_t)(cmd)); \
                                            DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
@@ -81,6 +101,30 @@ enum CmdAdafruitType
                                                  DisplaySerialPort.write((uint8_t)(val4)); DisplaySerialPort.write((uint8_t)((val4) >> 8)); \
                                                  DisplaySerialPort.write((uint8_t)(val5)); DisplaySerialPort.write((uint8_t)((val5) >> 8));
 
+#ifdef Mx_Display_Reference
+class Mx_Display_Serial_Adafruit : public Adafruit_GFX
+{
+public:
+  Mx_Display_Serial_Adafruit(byte dummy) : Adafruit_GFX(DisplayWidth, DisplayHeight)
+  {
+  }
+
+  void drawPixel(int16_t x, int16_t y, uint16_t color)
+  {
+    Cmd3w(CmdDrawPixel, x, y, color);
+  }
+
+  void setBackbuffer(uint8_t b)
+  {
+    Cmd1b(CmdSetBackBuffer, b);
+  }
+
+  void copyToBackbuffer(uint8_t b)
+  {
+    Cmd1b(CmdCopyToBackbuffer, b);
+  }
+};
+#else
 class Mx_Display_Serial_Adafruit
 {
 public:
@@ -162,6 +206,31 @@ public:
   }
 
   /// <summary>
+  /// fill a rectangle completely with one color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">rectangle width</param>
+  /// <param name="h">rectangle height</param>
+  /// <param name="color">fill-color</param>
+  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+  {
+    Cmd5w(CmdFillRect, x, y, w, h, color);
+  }
+
+  /// <summary>
+  /// draw a circle outline
+  /// </summary>
+  /// <param name="x">center x-position</param>
+  /// <param name="y">center y-position</param>
+  /// <param name="r">radius</param>
+  /// <param name="color">border-color</param>
+  void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
+  {
+    Cmd4w(CmdDrawCircle, x, y, r, color);
+  }
+
+  /// <summary>
   /// set display rotation
   /// </summary>
   /// <param name="r">rotation value (0-3)</param>
@@ -202,7 +271,13 @@ private:
   int16_t _width = DisplayWidth;
   int16_t _height = DisplayHeight;
 };
+#endif
 
-Mx_Display_Serial_Adafruit DisplaySerialName;
+#ifdef Mx_Display_Reference
+Mx_Display_Serial_Adafruit tft(0);
+#else
+//Mx_Display_Serial_Adafruit DisplaySerialName;
+Mx_Display_Serial_Adafruit tft;
+#endif
 
 #endif _MX_DISPLAY_SERIAL_ADA_h

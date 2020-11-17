@@ -1,6 +1,7 @@
 
 #include <arduino.h>
 #include "../Mx_Basics.h"
+//#define Mx_Display_Reference
 #include "../Mx_Display_Serial_Ada.h"
 
 // Assign human-readable names to some common 16-bit color values:
@@ -140,28 +141,28 @@ unsigned long testRects(uint16_t color)
   return micros() - start;
 }
 
-//unsigned long testFilledRects(uint16_t color1, uint16_t color2)
-//{
-//  unsigned long start, t = 0;
-//  int n, i, i2;
-//  int cx = tft.width() / 2 - 1;
-//  int cy = tft.height() / 2 - 1;
-//
-//  tft.fillScreen(BLACK);
-//  n = min(tft.width(), tft.height());
-//  for (i = n; i > 0; i -= 6)
-//  {
-//    i2 = i / 2;
-//    start = micros();
-//    tft.fillRect(cx - i2, cy - i2, i, i, color1);
-//    t += micros() - start;
-//    // Outlines are not included in timing results
-//    tft.drawRect(cx - i2, cy - i2, i, i, color2);
-//  }
-//
-//  return t;
-//}
-//
+unsigned long testFilledRects(uint16_t color1, uint16_t color2)
+{
+  unsigned long start, t = 0;
+  int n, i, i2;
+  int cx = tft.width() / 2 - 1;
+  int cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(BLACK);
+  n = min(tft.width(), tft.height());
+  for (i = n; i > 0; i -= 6)
+  {
+    i2 = i / 2;
+    start = micros();
+    tft.fillRect(cx - i2, cy - i2, i, i, color1);
+    t += micros() - start;
+    // Outlines are not included in timing results
+    tft.drawRect(cx - i2, cy - i2, i, i, color2);
+  }
+
+  return t;
+}
+
 //unsigned long testFilledCircles(uint8_t radius, uint16_t color)
 //{
 //  unsigned long start;
@@ -179,28 +180,28 @@ unsigned long testRects(uint16_t color)
 //
 //  return micros() - start;
 //}
-//
-//unsigned long testCircles(uint8_t radius, uint16_t color)
-//{
-//  unsigned long start;
-//  int x, y, r2 = radius * 2;
-//  int w = tft.width() + radius;
-//  int h = tft.height() + radius;
-//
-//  // Screen is not cleared for this one -- this is
-//  // intentional and does not affect the reported time.
-//  start = micros();
-//  for (x = 0; x < w; x += r2)
-//  {
-//    for (y = 0; y < h; y += r2)
-//    {
-//      tft.drawCircle(x, y, radius, color);
-//    }
-//  }
-//
-//  return micros() - start;
-//}
-//
+
+unsigned long testCircles(uint8_t radius, uint16_t color)
+{
+  unsigned long start;
+  int x, y, r2 = radius * 2;
+  int w = tft.width() + radius;
+  int h = tft.height() + radius;
+
+  // Screen is not cleared for this one -- this is
+  // intentional and does not affect the reported time.
+  start = micros();
+  for (x = 0; x < w; x += r2)
+  {
+    for (y = 0; y < h; y += r2)
+    {
+      tft.drawCircle(x, y, radius, color);
+    }
+  }
+
+  return micros() - start;
+}
+
 //unsigned long testTriangles()
 //{
 //  unsigned long start;
@@ -302,15 +303,15 @@ void setup(void)
   //delay(500);
 
   testRects(GREEN);
-  delay(500);
+  //delay(500);
 
-  //testFilledRects(YELLOW, MAGENTA);
+  testFilledRects(YELLOW, MAGENTA);
   //delay(500);
 
   //testFilledCircles(10, MAGENTA);
 
-  //testCircles(10, WHITE);
-  //delay(500);
+  testCircles(10, WHITE);
+  delay(500);
 
   //testTriangles();
   //delay(500);
@@ -327,6 +328,20 @@ void setup(void)
 
 void loop(void)
 {
+  // --- measure test ---
+  //tft.fillScreen(0x0000);
+
+  //tft.fillRect(10, 10, 1, 1, 0xffff);
+  //tft.fillRect(20, 10, 1, 1, 0xffff);
+  //tft.fillRect(10, 20, 1, 1, 0xffff);
+  //tft.fillRect(20, 20, 1, 1, 0xffff);
+  //
+  //tft.fillRect(11, 11, 9, 9, GREEN);
+
+  //delay(1000);
+
+  return;
+
   for (uint8_t rotation = 0; rotation < 4; rotation++)
   {
     tft.setRotation(rotation);

@@ -55,6 +55,11 @@ namespace SerialDisplay
       /// </summary>
       CmdFillScreen,
       /// <summary>
+      /// draw a pixel :)
+      /// [int16_t x, int16_t y, uint16_t color]
+      /// </summary>
+      CmdDrawPixel,
+      /// <summary>
       /// fast drawing of a horizontal line
       /// [int16_t x, int16_t y, int16_t w, uint16_t color]
       /// </summary>
@@ -74,6 +79,16 @@ namespace SerialDisplay
       /// [int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color]
       /// </summary>
       CmdDrawRect,
+      /// <summary>
+      /// fill a rectangle completely with one color
+      /// [int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color]
+      /// </summary>
+      CmdFillRect,
+      /// <summary>
+      /// draw a circle outline
+      /// [int16_t x, int16_t y, int16_t r, uint16_t color]
+      /// </summary>
+      CmdDrawCircle,
       /// <summary>
       /// set display rotation (0-3)
       /// [uint8_t rotation]
@@ -102,12 +117,15 @@ namespace SerialDisplay
       {
         case CmdAdafruitType.CmdNop: return 1;
         case CmdAdafruitType.CmdFillScreen: return 1 + sizeof(ushort);
-        case CmdAdafruitType.CmdFastHLine: return 1 + sizeof(ushort) * 4;
+        case CmdAdafruitType.CmdDrawPixel: return 1 + sizeof(ushort) * 3;
+        case CmdAdafruitType.CmdFastHLine:
         case CmdAdafruitType.CmdFastVLine: return 1 + sizeof(ushort) * 4;
-        case CmdAdafruitType.CmdDrawLine: return 1 + sizeof(ushort) * 5;
-        case CmdAdafruitType.CmdDrawRect: return 1 + sizeof(ushort) * 5;
-        case CmdAdafruitType.CmdSetRotation: return 1 + sizeof(byte);
-        case CmdAdafruitType.CmdSetBackBuffer: return 1 + sizeof(byte);
+        case CmdAdafruitType.CmdDrawLine:
+        case CmdAdafruitType.CmdDrawRect:
+        case CmdAdafruitType.CmdFillRect: return 1 + sizeof(ushort) * 5;
+        case CmdAdafruitType.CmdDrawCircle: return 1 + sizeof(ushort) * 4;
+        case CmdAdafruitType.CmdSetRotation:
+        case CmdAdafruitType.CmdSetBackBuffer:
         case CmdAdafruitType.CmdCopyToBackbuffer: return 1 + sizeof(byte);
         default: return 1; // unknown command
       }
@@ -124,7 +142,7 @@ namespace SerialDisplay
       return (c & 0xf800) << 8 | (c & 0x07e0) << 5 | (c & 0x001f) << 3 | 0xff000000;
     }
 
-    #region # // --- FillScreen ---
+    #region # // --- FillScreen + DrawPixel ---
     /// <summary>
     /// fills the entire screen with one colour
     /// </summary>
@@ -139,6 +157,35 @@ namespace SerialDisplay
         *(ulong*)(ptr + i + 2) = colorLong;
         *(ulong*)(ptr + i + 4) = colorLong;
         *(ulong*)(ptr + i + 6) = colorLong;
+      }
+    }
+
+    /// <summary>
+    /// draw a pixel :)
+    /// </summary>
+    /// <param name="ptr">pointer to the backbuffer</param>
+    /// <param name="x">x-position</param>
+    /// <param name="y">y-position</param>
+    /// <param name="color">pixel-color</param>
+    static void DrawPixel(uint* ptr, int x, int y, uint color)
+    {
+      if ((uint)x >= currentWidth || (uint)y >= currentHeight) return;
+
+      if (currentRotation == 0)
+      {
+        ptr[x + y * Width] = color;
+      }
+      else if (currentRotation == 1)
+      {
+        ptr[Width - 1 - y + x * Width] = color;
+      }
+      else if (currentRotation == 2)
+      {
+        ptr[Width - 1 - x + (Height - 1 - y) * Width] = color;
+      }
+      else
+      {
+        ptr[y + (Height - 1 - x) * Width] = color;
       }
     }
     #endregion
@@ -434,7 +481,7 @@ namespace SerialDisplay
     }
     #endregion
 
-    #region # --- CopyToBackbuffer ---
+    #region # // --- CopyToBackbuffer ---
     /// <summary>
     /// copy entire backbuffer
     /// </summary>
@@ -445,13 +492,78 @@ namespace SerialDisplay
       for (int i = 0; i < Width * Height; i += 8)
       {
         ulong tmp0 = *(ulong*)(from + i);
-        ulong tmp1 = *(ulong*)(from + i+2);
-        ulong tmp2 = *(ulong*)(from + i+4);
-        ulong tmp3 = *(ulong*)(from + i+6);
+        ulong tmp1 = *(ulong*)(from + i + 2);
+        ulong tmp2 = *(ulong*)(from + i + 4);
+        ulong tmp3 = *(ulong*)(from + i + 6);
         *(ulong*)(to + i) = tmp0;
         *(ulong*)(to + i + 2) = tmp1;
         *(ulong*)(to + i + 4) = tmp2;
         *(ulong*)(to + i + 6) = tmp3;
+      }
+    }
+    #endregion
+
+    #region # // --- DrawCircle ---
+    static void DrawCircle(uint* ptr, int x, int y, int r, uint color)
+    {
+      if (currentRotation != 0)
+      {
+        if (currentRotation == 1)
+        {
+          int t = x;
+          x = Width - 1 - y;
+          y = t;
+        }
+        else if (currentRotation == 2)
+        {
+          x = Width - 1 - x;
+          y = Height - 1 - y;
+        }
+        else
+        {
+          int t = x;
+          x = y;
+          y = Height - 1 - t;
+        }
+      }
+
+      int f = 1 - r;
+      int ddF_x = 1;
+      int ddF_y = -2 * r;
+      int px = 0;
+      int py = r;
+
+      if ((uint)x < Width)
+      {
+        if ((uint)(y + r) < Height) ptr[x + (y + r) * Width] = color;
+        if ((uint)(y - r) < Height) ptr[x + (y - r) * Width] = color;
+      }
+      if ((uint)y < Height)
+      {
+        if ((uint)(x + r) < Width) ptr[x + r + y * Width] = color;
+        if ((uint)(x - r) < Width) ptr[x - r + y * Width] = color;
+      }
+
+      while (px < py)
+      {
+        if (f >= 0)
+        {
+          py--;
+          ddF_y += 2;
+          f += ddF_y;
+        }
+        px++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        if ((uint)(x + px) < Width && (uint)(y + py) < Height) ptr[x + px + (y + py) * Width] = color;
+        if ((uint)(x - px) < Width && (uint)(y + py) < Height) ptr[x - px + (y + py) * Width] = color;
+        if ((uint)(x + px) < Width && (uint)(y - py) < Height) ptr[x + px + (y - py) * Width] = color;
+        if ((uint)(x - px) < Width && (uint)(y - py) < Height) ptr[x - px + (y - py) * Width] = color;
+        if ((uint)(x + py) < Width && (uint)(y + px) < Height) ptr[x + py + (y + px) * Width] = color;
+        if ((uint)(x - py) < Width && (uint)(y + px) < Height) ptr[x - py + (y + px) * Width] = color;
+        if ((uint)(x + py) < Width && (uint)(y - px) < Height) ptr[x + py + (y - px) * Width] = color;
+        if ((uint)(x - py) < Width && (uint)(y - px) < Height) ptr[x - py + (y - px) * Width] = color;
       }
     }
     #endregion
@@ -477,6 +589,15 @@ namespace SerialDisplay
           uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs));
           FillScreen(p, color);
           return 1 + sizeof(ushort);
+        }
+
+        case CmdAdafruitType.CmdDrawPixel:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 2));
+          DrawPixel(p, x, y, color);
+          return 1 + sizeof(ushort) * 3;
         }
 
         case CmdAdafruitType.CmdFastHLine:
@@ -522,6 +643,27 @@ namespace SerialDisplay
           FastVLine(p, x, y, h, color);
           FastVLine(p, x + w - 1, y, h, color);
           return 1 + sizeof(ushort) * 5;
+        }
+
+        case CmdAdafruitType.CmdFillRect:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int w = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int h = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 4));
+          for (int i = 0; i < h; i++) FastHLine(p, x, y + i, w, color);
+          return 1 + sizeof(ushort) * 5;
+        }
+
+        case CmdAdafruitType.CmdDrawCircle:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int r = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3));
+          DrawCircle(p, x, y, r, color);
+          return 1 + sizeof(ushort) * 4;
         }
 
         case CmdAdafruitType.CmdSetRotation:

@@ -149,7 +149,8 @@ namespace SerialDisplay
     {
       int sizeX = DisplayCmd.Width;
       int sizeY = DisplayCmd.Height;
-      while (sizeX + DisplayCmd.Width < 1280 && sizeY + DisplayCmd.Height < 720)
+      var screen = Screen.PrimaryScreen.Bounds.Size;
+      while (sizeX + DisplayCmd.Width < screen.Width - 32 && sizeY + DisplayCmd.Height < screen.Height - 32)
       {
         sizeX += DisplayCmd.Width;
         sizeY += DisplayCmd.Height;
