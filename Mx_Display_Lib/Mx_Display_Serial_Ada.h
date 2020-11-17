@@ -55,6 +55,21 @@ enum CmdAdafruitType
   /// </summary>
   CmdDrawCircle,
   /// <summary>
+  /// draw a circle with filled color
+  /// [int16_t x, int16_t y, int16_t r, uint16_t color]
+  /// </summary>
+  CmdFillCircle,
+  /// <summary>
+  /// draw a triangle with no fill color
+  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+  /// </summary>
+  CmdDrawTriangle,
+  /// <summary>
+  /// draw a triangle with filled color
+  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+  /// </summary>
+  CmdFillTriangle,
+  /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
   /// </summary>
@@ -77,29 +92,15 @@ enum CmdAdafruitType
 #define DisplayHeight 240
 
 #define Cmd(cmd) DisplaySerialPort.write((uint8_t)(cmd));
-
-#define Cmd1b(cmd, val1) DisplaySerialPort.write((uint8_t)(cmd)); DisplaySerialPort.write((uint8_t)(val1));
-
-#define Cmd1w(cmd, val1) DisplaySerialPort.write((uint8_t)(cmd)); \
-                         DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8));
-
-#define Cmd3w(cmd, val1, val2, val3) DisplaySerialPort.write((uint8_t)(cmd)); \
-                                     DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
-                                     DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
-                                     DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8));
-
-#define Cmd4w(cmd, val1, val2, val3, val4) DisplaySerialPort.write((uint8_t)(cmd)); \
-                                           DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
-                                           DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
-                                           DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8)); \
-                                           DisplaySerialPort.write((uint8_t)(val4)); DisplaySerialPort.write((uint8_t)((val4) >> 8));
-
-#define Cmd5w(cmd, val1, val2, val3, val4, val5) DisplaySerialPort.write((uint8_t)(cmd)); \
-                                                 DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8)); \
-                                                 DisplaySerialPort.write((uint8_t)(val2)); DisplaySerialPort.write((uint8_t)((val2) >> 8)); \
-                                                 DisplaySerialPort.write((uint8_t)(val3)); DisplaySerialPort.write((uint8_t)((val3) >> 8)); \
-                                                 DisplaySerialPort.write((uint8_t)(val4)); DisplaySerialPort.write((uint8_t)((val4) >> 8)); \
-                                                 DisplaySerialPort.write((uint8_t)(val5)); DisplaySerialPort.write((uint8_t)((val5) >> 8));
+#define Cmd1b(cmd, val1) Cmd(cmd); DisplaySerialPort.write((uint8_t)(val1));
+#define Val1w(val) DisplaySerialPort.write((uint8_t)(val)); DisplaySerialPort.write((uint8_t)((val) >> 8));
+#define Cmd1w(cmd, val1) Cmd(cmd); Val1w(val1);
+#define Cmd2w(cmd, val1, val2) Cmd1w(cmd, val1); Val1w(val2);
+#define Cmd3w(cmd, val1, val2, val3) Cmd2w(cmd, val1, val2); Val1w(val3);
+#define Cmd4w(cmd, val1, val2, val3, val4) Cmd3w(cmd, val1, val2, val3); Val1w(val4);
+#define Cmd5w(cmd, val1, val2, val3, val4, val5) Cmd4w(cmd, val1, val2, val3, val4); Val1w(val5);
+#define Cmd6w(cmd, val1, val2, val3, val4, val5, val6) Cmd5w(cmd, val1, val2, val3, val4, val5); Val1w(val6);
+#define Cmd7w(cmd, val1, val2, val3, val4, val5, val6, val7) Cmd6w(cmd, val1, val2, val3, val4, val5, val6); Val1w(val7);
 
 #ifdef Mx_Display_Reference
 class Mx_Display_Serial_Adafruit : public Adafruit_GFX
@@ -228,6 +229,48 @@ public:
   void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
   {
     Cmd4w(CmdDrawCircle, x, y, r, color);
+  }
+
+  /// <summary>
+  /// draw a circle with filled color
+  /// </summary>
+  /// <param name="x">center x-position</param>
+  /// <param name="y">center y-position</param>
+  /// <param name="r">radius</param>
+  /// <param name="color">fill-color</param>
+  void fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
+  {
+    Cmd4w(CmdFillCircle, x, y, r, color);
+  }
+
+  /// <summary>
+  /// draw a triangle with no fill color
+  /// </summary>
+  /// <param name="x1">first vertex x-position</param>
+  /// <param name="y1">first vertex y-position</param>
+  /// <param name="x2">second vertex x-position</param>
+  /// <param name="y2">second vertex y-position</param>
+  /// <param name="x3">third vertex x-position</param>
+  /// <param name="y3">third vertex y-position</param>
+  /// <param name="color">border-color</param>
+  void drawTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
+  {
+    Cmd7w(CmdDrawTriangle, x1, y1, x2, y2, x3, y3, color);
+  }
+
+  /// <summary>
+  /// draw a triangle with filled color
+  /// </summary>
+  /// <param name="x1">first vertex x-position</param>
+  /// <param name="y1">first vertex y-position</param>
+  /// <param name="x2">second vertex x-position</param>
+  /// <param name="y2">second vertex y-position</param>
+  /// <param name="x3">third vertex x-position</param>
+  /// <param name="y3">third vertex y-position</param>
+  /// <param name="color">fill-color</param>
+  void fillTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
+  {
+    Cmd7w(CmdFillTriangle, x1, y1, x2, y2, x3, y3, color);
   }
 
   /// <summary>

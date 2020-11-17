@@ -163,23 +163,23 @@ unsigned long testFilledRects(uint16_t color1, uint16_t color2)
   return t;
 }
 
-//unsigned long testFilledCircles(uint8_t radius, uint16_t color)
-//{
-//  unsigned long start;
-//  int x, y, w = tft.width(), h = tft.height(), r2 = radius * 2;
-//
-//  tft.fillScreen(BLACK);
-//  start = micros();
-//  for (x = radius; x < w; x += r2)
-//  {
-//    for (y = radius; y < h; y += r2)
-//    {
-//      tft.fillCircle(x, y, radius, color);
-//    }
-//  }
-//
-//  return micros() - start;
-//}
+unsigned long testFilledCircles(uint8_t radius, uint16_t color)
+{
+  unsigned long start;
+  int x, y, w = tft.width(), h = tft.height(), r2 = radius * 2;
+
+  tft.fillScreen(BLACK);
+  start = micros();
+  for (x = radius; x < w; x += r2)
+  {
+    for (y = radius; y < h; y += r2)
+    {
+      tft.fillCircle(x, y, radius, color);
+    }
+  }
+
+  return micros() - start;
+}
 
 unsigned long testCircles(uint8_t radius, uint16_t color)
 {
@@ -202,48 +202,48 @@ unsigned long testCircles(uint8_t radius, uint16_t color)
   return micros() - start;
 }
 
-//unsigned long testTriangles()
-//{
-//  unsigned long start;
-//  int n, i;
-//  int cx = tft.width() / 2 - 1;
-//  int cy = tft.height() / 2 - 1;
-//
-//  tft.fillScreen(BLACK);
-//  n = min(cx, cy);
-//  start = micros();
-//  for (i = 0; i < n; i += 5)
-//  {
-//    tft.drawTriangle(
-//      cx, cy - i, // peak
-//      cx - i, cy + i, // bottom left
-//      cx + i, cy + i, // bottom right
-//      color565(0, 0, i));
-//  }
-//
-//  return micros() - start;
-//}
-//
-//unsigned long testFilledTriangles()
-//{
-//  unsigned long start, t = 0;
-//  int i;
-//  int cx = tft.width() / 2 - 1;
-//  int cy = tft.height() / 2 - 1;
-//
-//  tft.fillScreen(BLACK);
-//  start = micros();
-//  for (i = min(cx, cy); i > 10; i -= 5)
-//  {
-//    start = micros();
-//    tft.fillTriangle(cx, cy - i, cx - i, cy + i, cx + i, cy + i, color565(0, i, i));
-//    t += micros() - start;
-//    tft.drawTriangle(cx, cy - i, cx - i, cy + i, cx + i, cy + i, color565(i, i, 0));
-//  }
-//
-//  return t;
-//}
-//
+unsigned long testTriangles()
+{
+  unsigned long start;
+  int n, i;
+  int cx = tft.width() / 2 - 1;
+  int cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(BLACK);
+  n = min(cx, cy);
+  start = micros();
+  for (i = 0; i < n; i += 5)
+  {
+    tft.drawTriangle(
+      cx, cy - i, // peak
+      cx - i, cy + i, // bottom left
+      cx + i, cy + i, // bottom right
+      color565(0, 0, i));
+  }
+
+  return micros() - start;
+}
+
+unsigned long testFilledTriangles()
+{
+  unsigned long start, t = 0;
+  int i;
+  int cx = tft.width() / 2 - 1;
+  int cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(BLACK);
+  start = micros();
+  for (i = min(cx, cy); i > 10; i -= 5)
+  {
+    start = micros();
+    tft.fillTriangle(cx, cy - i, cx - i, cy + i, cx + i, cy + i, color565(0, i, i));
+    t += micros() - start;
+    tft.drawTriangle(cx, cy - i, cx - i, cy + i, cx + i, cy + i, color565(i, i, 0));
+  }
+
+  return t;
+}
+
 //unsigned long testRoundRects()
 //{
 //  unsigned long start;
@@ -290,34 +290,34 @@ void setup(void)
   tft.setRotation(0);
   tft.setBackbuffer(0);
 
-  testFillScreen();
+  //testFillScreen();
   //delay(500);
 
   //testText();
   //delay(3000);
 
-  testLines(CYAN);
+  //testLines(CYAN);
   //delay(500);
 
-  testFastLines(RED, BLUE);
+  //testFastLines(RED, BLUE);
   //delay(500);
 
-  testRects(GREEN);
+  //testRects(GREEN);
   //delay(500);
 
-  testFilledRects(YELLOW, MAGENTA);
+  //testFilledRects(YELLOW, MAGENTA);
   //delay(500);
 
-  //testFilledCircles(10, MAGENTA);
+  testFilledCircles(10, MAGENTA);
 
   testCircles(10, WHITE);
   delay(500);
 
-  //testTriangles();
-  //delay(500);
+  testTriangles();
+  delay(500);
 
-  //testFilledTriangles();
-  //delay(500);
+  testFilledTriangles();
+  delay(500);
 
   //testRoundRects();
   //delay(500);

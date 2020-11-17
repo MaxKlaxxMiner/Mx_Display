@@ -19,7 +19,7 @@ namespace SerialDisplay
     static readonly byte[] buffer = new byte[65536];
     static int bufferReadPos;
     static int bufferWritePos;
-    const int MaxCmdLength = 1 + sizeof(short) * 5;
+    const int MaxCmdLength = 1 + sizeof(short) * 7;
 
     public DisplayForm()
     {
