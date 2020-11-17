@@ -286,6 +286,9 @@ void setup(void)
   digitalWriteDirect(13, LOW);
   Serial.begin(500000);
 
+  tft.setRotation(0);
+  tft.setBackbuffer(0);
+
   testFillScreen();
   delay(500);
 
@@ -324,11 +327,35 @@ void setup(void)
 
 void loop(void)
 {
+  for (uint8_t rotation = 0; rotation < 4; rotation++)
+  {
+    tft.setRotation(rotation);
+    for (int x = 0; x < tft.width(); x++)
+    {
+      tft.drawLine(x, 0, 0, tft.height() - 1, color565(0, (uint32_t)x * 128 / tft.width(), (uint32_t)x * 256 / tft.width()));
+    }
+    for (int y = 0; y < tft.height(); y++)
+    {
+      tft.drawLine(tft.width() - 1, y, 0, tft.height() - 1, color565((uint32_t)y * 256 / tft.height(), (uint32_t)y * 128 / tft.height() + 127, 255));
+    }
+    tft.copyToBackbuffer(rotation + 1);
+  }
+
+  for (;;)
+  {
+    for (uint8_t b = 1; b <= 4; b++)
+    {
+      tft.setBackbuffer(b);
+      tft.copyToBackbuffer(0);
+      delay(250);
+    }
+  }
+
   //for (uint8_t rotation = 0; rotation < 4; rotation++)
   //{
   //  tft.setRotation(rotation);
-  //  testText();
-  //  delay(1000);
+  //  //testText();
+  //  //delay(1000);
   //  for (int x = 0; x < tft.width(); x++)
   //  {
   //    tft.drawLine(x, 0, 0, tft.height() - 1, color565(0, (uint32_t)x * 128 / tft.width(), (uint32_t)x * 256 / tft.width()));

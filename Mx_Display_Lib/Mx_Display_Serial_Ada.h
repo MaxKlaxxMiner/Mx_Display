@@ -30,6 +30,21 @@ enum CmdAdafruitType
   /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color]
   /// </summary>
   CmdDrawLine = 0x04,
+  /// <summary>
+  /// set display rotation (0-3)
+  /// [uint8_t rotation]
+  /// </summary>
+  CmdSetRotation = 0x05,
+  /// <summary>
+  /// set backbuffer (0-255)
+  /// [uint8_t index]
+  /// </summary>
+  CmdSetBackBuffer = 0x06,
+  /// <summary>
+  /// copy current display to another backbuffer (or frontbuffer)
+  /// [uint8_t index]
+  /// </summary>
+  CmdCopyToBackbuffer = 0x07,
 };
 
 #define DisplaySerialPort Serial
@@ -38,6 +53,8 @@ enum CmdAdafruitType
 #define DisplayHeight 240
 
 #define Cmd(cmd) DisplaySerialPort.write((uint8_t)(cmd));
+
+#define Cmd1b(cmd, val1) DisplaySerialPort.write((uint8_t)(cmd)); DisplaySerialPort.write((uint8_t)(val1));
 
 #define Cmd1w(cmd, val1) DisplaySerialPort.write((uint8_t)(cmd)); \
                          DisplaySerialPort.write((uint8_t)(val1)); DisplaySerialPort.write((uint8_t)((val1) >> 8));
@@ -120,6 +137,43 @@ public:
   void drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
   {
     Cmd5w(CmdDrawLine, x1, y1, x2, y2, color);
+  }
+
+  /// <summary>
+  /// set display rotation
+  /// </summary>
+  /// <param name="r">rotation value (0-3)</param>
+  void setRotation(uint8_t r)
+  {
+    Cmd1b(CmdSetRotation, r);
+    if (r & 1)
+    {
+      _width = DisplayHeight;
+      _height = DisplayWidth;
+    }
+    else
+    {
+      _width = DisplayWidth;
+      _height = DisplayHeight;
+    }
+  }
+
+  /// <summary>
+  /// set the drawing backbuffer
+  /// </summary>
+  /// <param name="b">index of the backbuffer</param>
+  void setBackbuffer(uint8_t b)
+  {
+    Cmd1b(CmdSetBackBuffer, b);
+  }
+
+  /// <summary>
+  /// copy current buffer to target backbuffer
+  /// </summary>
+  /// <param name="b">index of the target backbuffer</param>
+  void copyToBackbuffer(uint8_t b)
+  {
+    Cmd1b(CmdCopyToBackbuffer, b);
   }
 
 private:
