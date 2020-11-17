@@ -3,7 +3,7 @@
 //#include "Tests/PinTest.h"
 
 // --- SerialDisplay-Tests ---
-#include "Tests/DisplayTestSerial1.h"
+#include "Tests/DisplayTestSerial2.h"
 
 int main()
 {

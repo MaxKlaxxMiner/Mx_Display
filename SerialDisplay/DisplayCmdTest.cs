@@ -3,38 +3,38 @@ using System;
 
 namespace SerialDisplay
 {
-  public static unsafe class DisplayCmd
+  public static unsafe class DisplayCmdTest
   {
     public const int Width = 320;
     public const int Height = 240;
     static uint currentColor = 0xffffff;
 
-    public static int CommandLength(DisplayCmdType type)
+    public static int CommandLength(byte type)
     {
-      switch (type)
+      switch ((DisplayCmdTestType)type)
       {
-        case DisplayCmdType.SelectColor565: return 1 + sizeof(ushort);
-        case DisplayCmdType.SelectColorTrue: return 1 + sizeof(byte) * 3;
-        case DisplayCmdType.DrawPixel: return 1 + sizeof(short) + sizeof(short);
-        case DisplayCmdType.DrawHLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short);
-        case DisplayCmdType.DrawVLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short);
-        case DisplayCmdType.DrawLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short) + sizeof(short);
+        case DisplayCmdTestType.SelectColor565: return 1 + sizeof(ushort);
+        case DisplayCmdTestType.SelectColorTrue: return 1 + sizeof(byte) * 3;
+        case DisplayCmdTestType.DrawPixel: return 1 + sizeof(short) + sizeof(short);
+        case DisplayCmdTestType.DrawHLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short);
+        case DisplayCmdTestType.DrawVLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short);
+        case DisplayCmdTestType.DrawLine: return 1 + sizeof(short) + sizeof(short) + sizeof(short) + sizeof(short);
         default: return 1;
       }
     }
 
     public static int Execute(byte[] buffer, int bufferReadPos, uint* bitmapPtr)
     {
-      switch ((DisplayCmdType)buffer[bufferReadPos++])
+      switch ((DisplayCmdTestType)buffer[bufferReadPos++])
       {
-        case DisplayCmdType.GetInfo: return 1;
-        case DisplayCmdType.SelectColor565:
+        case DisplayCmdTestType.GetInfo: return 1;
+        case DisplayCmdTestType.SelectColor565:
         {
           var c = (uint)BitConverter.ToUInt16(buffer, bufferReadPos);
           currentColor = (c & 0xf800) << 8 | (c & 0x07e0) << 5 | (c & 0x001f) << 3;
           return 1 + sizeof(ushort);
         }
-        case DisplayCmdType.SelectColorTrue:
+        case DisplayCmdTestType.SelectColorTrue:
         {
           uint c = buffer[bufferReadPos++];
           c |= (uint)buffer[bufferReadPos++] << 8;
@@ -42,7 +42,7 @@ namespace SerialDisplay
           currentColor = c;
           return 1 + sizeof(byte) * 3;
         }
-        case DisplayCmdType.DrawPixel:
+        case DisplayCmdTestType.DrawPixel:
         {
           short x = BitConverter.ToInt16(buffer, bufferReadPos);
           short y = BitConverter.ToInt16(buffer, bufferReadPos + sizeof(short));
@@ -52,7 +52,7 @@ namespace SerialDisplay
           }
           return 1 + sizeof(short) + sizeof(short);
         }
-        case DisplayCmdType.DrawHLine:
+        case DisplayCmdTestType.DrawHLine:
         {
           int x = BitConverter.ToInt16(buffer, bufferReadPos);
           int y = BitConverter.ToInt16(buffer, bufferReadPos + sizeof(short));
@@ -74,7 +74,7 @@ namespace SerialDisplay
           }
           return 1 + sizeof(short) + sizeof(short) + sizeof(short);
         }
-        case DisplayCmdType.DrawVLine:
+        case DisplayCmdTestType.DrawVLine:
         {
           int x = BitConverter.ToInt16(buffer, bufferReadPos);
           int y = BitConverter.ToInt16(buffer, bufferReadPos + sizeof(short));
@@ -96,7 +96,7 @@ namespace SerialDisplay
           }
           return 1 + sizeof(short) + sizeof(short) + sizeof(short);
         }
-        case DisplayCmdType.DrawLine:
+        case DisplayCmdTestType.DrawLine:
         {
           int x1 = BitConverter.ToInt16(buffer, bufferReadPos);
           int y1 = BitConverter.ToInt16(buffer, bufferReadPos + sizeof(short));

@@ -46,8 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DisplayCmd.cs" />
-    <Compile Include="DisplayCmdType.cs" />
+    <Compile Include="DisplayCmdAdafruit.cs" />
+    <Compile Include="DisplayCmdTest.cs" />
+    <Compile Include="DisplayCmdTestType.cs" />
     <Compile Include="DisplayForm.cs">
       <SubType>Form</SubType>
     </Compile>

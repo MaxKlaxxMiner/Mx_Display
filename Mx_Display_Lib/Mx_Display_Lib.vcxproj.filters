@@ -33,5 +33,9 @@
     <ClInclude Include="Tests\DisplayTestSerial1.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="Mx_Display_Serial_Ada.h" />
+    <ClInclude Include="Tests\DisplayTestSerial2.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

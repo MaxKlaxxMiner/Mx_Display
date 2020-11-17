@@ -1,7 +1,7 @@
 ﻿
 namespace SerialDisplay
 {
-  public enum DisplayCmdType : byte
+  public enum DisplayCmdTestType : byte
   {
     /// <summary>
     /// [1] - get display info

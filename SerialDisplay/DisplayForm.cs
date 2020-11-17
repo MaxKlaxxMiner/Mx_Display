@@ -6,6 +6,8 @@ using System.Drawing.Imaging;
 using System.IO.Ports;
 using System.Threading;
 using System.Windows.Forms;
+//using DisplayCmd = SerialDisplay.DisplayCmdTest;
+using DisplayCmd = SerialDisplay.DisplayCmdAdafruit;
 
 namespace SerialDisplay
 {
@@ -104,7 +106,7 @@ namespace SerialDisplay
         }
       }
 
-      return filled >= DisplayCmd.CommandLength((DisplayCmdType)buffer[bufferReadPos]);
+      return filled >= DisplayCmd.CommandLength(buffer[bufferReadPos]);
     }
 
     void displayTimer_Tick(object sender, EventArgs e)
@@ -135,7 +137,7 @@ namespace SerialDisplay
       if (BackgroundImage != null)
       {
         pevent.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-        //pevent.Graphics.Clear(this.BackColor);
+        //pevent.Graphics.Clear(BackColor);
         pevent.Graphics.DrawImage(BackgroundImage, 0, 0, ClientSize.Width, ClientSize.Height);
       }
       else
