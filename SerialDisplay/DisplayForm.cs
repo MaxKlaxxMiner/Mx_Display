@@ -6,14 +6,13 @@ using System.Drawing.Imaging;
 using System.IO.Ports;
 using System.Threading;
 using System.Windows.Forms;
-//using DisplayCmd = SerialDisplay.DisplayCmdTest;
 using DisplayCmd = SerialDisplay.DisplayCmdAdafruit;
 
 namespace SerialDisplay
 {
   public unsafe sealed partial class DisplayForm : Form
   {
-    const string DisplayPort = "COM6";
+    const string DisplayPort = "COM7";
 
     readonly SerialPort serialPort = new SerialPort(DisplayPort, 500000);
     static readonly Queue<byte[]> buffers = new Queue<byte[]>();

@@ -46,40 +46,49 @@ namespace SerialDisplay
     enum CmdAdafruitType
     {
       /// <summary>
+      /// empty command (no operation)
+      /// </summary>
+      CmdNop = 0x00,
+      /// <summary>
       /// fills the entire screen with one colour
       /// [uint16_t color]
       /// </summary>
-      CmdFillScreen = 0x01,
+      CmdFillScreen,
       /// <summary>
       /// fast drawing of a horizontal line
       /// [int16_t x, int16_t y, int16_t w, uint16_t color]
       /// </summary>
-      CmdFastHLine = 0x02,
+      CmdFastHLine,
       /// <summary>
       /// fast drawing of a vertical line
       /// [int16_t x, int16_t y, int16_t h, uint16_t color]
       /// </summary>
-      CmdFastVLine = 0x03,
+      CmdFastVLine,
       /// <summary>
       /// drawing normal line
       /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color]
       /// </summary>
-      CmdDrawLine = 0x04,
+      CmdDrawLine,
+      /// <summary>
+      /// draw a rectangle with no fill color
+      /// [int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color]
+      /// </summary>
+      CmdDrawRect,
       /// <summary>
       /// set display rotation (0-3)
       /// [uint8_t rotation]
       /// </summary>
-      CmdSetRotation = 0x05,
+      CmdSetRotation,
       /// <summary>
       /// set backbuffer (0-255)
       /// [uint8_t index]
       /// </summary>
-      CmdSetBackBuffer = 0x06,
+      CmdSetBackBuffer,
       /// <summary>
       /// copy current display to another backbuffer (or frontbuffer)
       /// [uint8_t index]
       /// </summary>
-      CmdCopyToBackbuffer = 0x07,
+      CmdCopyToBackbuffer,
     }
 
     /// <summary>
@@ -91,10 +100,12 @@ namespace SerialDisplay
     {
       switch ((CmdAdafruitType)cmd)
       {
+        case CmdAdafruitType.CmdNop: return 1;
         case CmdAdafruitType.CmdFillScreen: return 1 + sizeof(ushort);
         case CmdAdafruitType.CmdFastHLine: return 1 + sizeof(ushort) * 4;
         case CmdAdafruitType.CmdFastVLine: return 1 + sizeof(ushort) * 4;
         case CmdAdafruitType.CmdDrawLine: return 1 + sizeof(ushort) * 5;
+        case CmdAdafruitType.CmdDrawRect: return 1 + sizeof(ushort) * 5;
         case CmdAdafruitType.CmdSetRotation: return 1 + sizeof(byte);
         case CmdAdafruitType.CmdSetBackBuffer: return 1 + sizeof(byte);
         case CmdAdafruitType.CmdCopyToBackbuffer: return 1 + sizeof(byte);
@@ -177,7 +188,8 @@ namespace SerialDisplay
         }
       }
 
-      if ((uint)y >= currentHeight || x >= currentWidth || x + w - 1 < 0) // Edge rejection (no-draw if totally off canvas)
+      // Edge rejection (no-draw if totally off canvas)
+      if ((uint)y >= currentHeight || x >= currentWidth || x + w - 1 < 0)
       {
         return;
       }
@@ -458,10 +470,12 @@ namespace SerialDisplay
 
       switch ((CmdAdafruitType)cmd)
       {
+        case CmdAdafruitType.CmdNop: return 1;
+
         case CmdAdafruitType.CmdFillScreen:
         {
-          ushort color = BitConverter.ToUInt16(buffer, bufferOfs);
-          FillScreen(p, Color565ToArgb(color));
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs));
+          FillScreen(p, color);
           return 1 + sizeof(ushort);
         }
 
@@ -470,8 +484,8 @@ namespace SerialDisplay
           int x = BitConverter.ToInt16(buffer, bufferOfs);
           int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
           int w = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
-          ushort color = BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3);
-          FastHLine(p, x, y, w, Color565ToArgb(color));
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3));
+          FastHLine(p, x, y, w, color);
           return 1 + sizeof(ushort) * 4;
         }
 
@@ -480,8 +494,8 @@ namespace SerialDisplay
           int x = BitConverter.ToInt16(buffer, bufferOfs);
           int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
           int h = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
-          ushort color = BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3);
-          FastVLine(p, x, y, h, Color565ToArgb(color));
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 3));
+          FastVLine(p, x, y, h, color);
           return 1 + sizeof(ushort) * 4;
         }
 
@@ -491,8 +505,22 @@ namespace SerialDisplay
           int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
           int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
           int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
-          ushort color = BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 4);
-          DrawLine(p, x1, y1, x2, y2, Color565ToArgb(color));
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 4));
+          DrawLine(p, x1, y1, x2, y2, color);
+          return 1 + sizeof(ushort) * 5;
+        }
+
+        case CmdAdafruitType.CmdDrawRect:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int w = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int h = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 4));
+          FastHLine(p, x, y, w, color);
+          FastHLine(p, x, y + h - 1, w, color);
+          FastVLine(p, x, y, h, color);
+          FastVLine(p, x + w - 1, y, h, color);
           return 1 + sizeof(ushort) * 5;
         }
 

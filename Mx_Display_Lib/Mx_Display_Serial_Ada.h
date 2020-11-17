@@ -11,40 +11,49 @@
 enum CmdAdafruitType
 {
   /// <summary>
+  /// empty command (no operation)
+  /// </summary>
+  CmdNop = 0x00,
+  /// <summary>
   /// fills the entire screen with one colour
   /// [uint16_t color]
   /// </summary>
-  CmdFillScreen = 0x01,
+  CmdFillScreen,
   /// <summary>
   /// fast drawing of a horizontal line
   /// [int16_t x, int16_t y, int16_t w, uint16_t color]
   /// </summary>
-  CmdFastHLine = 0x02,
+  CmdFastHLine,
   /// <summary>
   /// fast drawing of a vertical line
   /// [int16_t x, int16_t y, int16_t h, uint16_t color]
   /// </summary>
-  CmdFastVLine = 0x03,
+  CmdFastVLine,
   /// <summary>
   /// drawing normal line
   /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color]
   /// </summary>
-  CmdDrawLine = 0x04,
+  CmdDrawLine,
+  /// <summary>
+  /// draw a rectangle with no fill color
+  /// [int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color]
+  /// </summary>
+  CmdDrawRect,
   /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
   /// </summary>
-  CmdSetRotation = 0x05,
+  CmdSetRotation,
   /// <summary>
   /// set backbuffer (0-255)
   /// [uint8_t index]
   /// </summary>
-  CmdSetBackBuffer = 0x06,
+  CmdSetBackBuffer,
   /// <summary>
   /// copy current display to another backbuffer (or frontbuffer)
   /// [uint8_t index]
   /// </summary>
-  CmdCopyToBackbuffer = 0x07,
+  CmdCopyToBackbuffer,
 };
 
 #define DisplaySerialPort Serial
@@ -137,6 +146,19 @@ public:
   void drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
   {
     Cmd5w(CmdDrawLine, x1, y1, x2, y2, color);
+  }
+
+  /// <summary>
+  /// draw a rectangle with no fill color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">rectangle width</param>
+  /// <param name="h">rectangle height</param>
+  /// <param name="color">border-color</param>
+  void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+  {
+    Cmd5w(CmdDrawRect, x, y, w, h, color);
   }
 
   /// <summary>

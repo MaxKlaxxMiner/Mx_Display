@@ -121,25 +121,25 @@ unsigned long testFastLines(uint16_t color1, uint16_t color2)
   return micros() - start;
 }
 
-//unsigned long testRects(uint16_t color)
-//{
-//  unsigned long start;
-//  int n, i, i2;
-//  int cx = tft.width() / 2;
-//  int cy = tft.height() / 2;
-//
-//  tft.fillScreen(BLACK);
-//  n = min(tft.width(), tft.height());
-//  start = micros();
-//  for (i = 2; i < n; i += 6)
-//  {
-//    i2 = i / 2;
-//    tft.drawRect(cx - i2, cy - i2, i, i, color);
-//  }
-//
-//  return micros() - start;
-//}
-//
+unsigned long testRects(uint16_t color)
+{
+  unsigned long start;
+  int n, i, i2;
+  int cx = tft.width() / 2;
+  int cy = tft.height() / 2;
+
+  tft.fillScreen(BLACK);
+  n = min(tft.width(), tft.height());
+  start = micros();
+  for (i = 2; i < n; i += 6)
+  {
+    i2 = i / 2;
+    tft.drawRect(cx - i2, cy - i2, i, i, color);
+  }
+
+  return micros() - start;
+}
+
 //unsigned long testFilledRects(uint16_t color1, uint16_t color2)
 //{
 //  unsigned long start, t = 0;
@@ -290,19 +290,19 @@ void setup(void)
   tft.setBackbuffer(0);
 
   testFillScreen();
-  delay(500);
+  //delay(500);
 
   //testText();
   //delay(3000);
 
   testLines(CYAN);
-  delay(500);
+  //delay(500);
 
   testFastLines(RED, BLUE);
-  delay(500);
-
-  //testRects(GREEN);
   //delay(500);
+
+  testRects(GREEN);
+  delay(500);
 
   //testFilledRects(YELLOW, MAGENTA);
   //delay(500);
