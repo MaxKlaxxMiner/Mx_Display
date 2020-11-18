@@ -244,42 +244,42 @@ unsigned long testFilledTriangles()
   return t;
 }
 
-//unsigned long testRoundRects()
-//{
-//  unsigned long start;
-//  int w, i, i2;
-//  int cx = tft.width() / 2 - 1;
-//  int cy = tft.height() / 2 - 1;
-//
-//  tft.fillScreen(BLACK);
-//  w = min(tft.width(), tft.height());
-//  start = micros();
-//  for (i = 0; i < w; i += 6)
-//  {
-//    i2 = i / 2;
-//    tft.drawRoundRect(cx - i2, cy - i2, i, i, i / 8, color565(i, 0, 0));
-//  }
-//
-//  return micros() - start;
-//}
-//
-//unsigned long testFilledRoundRects()
-//{
-//  unsigned long start;
-//  int i, i2;
-//  int cx = tft.width() / 2 - 1;
-//  int cy = tft.height() / 2 - 1;
-//
-//  tft.fillScreen(BLACK);
-//  start = micros();
-//  for (i = min(tft.width(), tft.height()); i > 20; i -= 6)
-//  {
-//    i2 = i / 2;
-//    tft.fillRoundRect(cx - i2, cy - i2, i, i, i / 8, color565(0, i, 0));
-//  }
-//
-//  return micros() - start;
-//}
+unsigned long testRoundRects()
+{
+  unsigned long start;
+  int w, i, i2;
+  int cx = tft.width() / 2 - 1;
+  int cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(BLACK);
+  w = min(tft.width(), tft.height());
+  start = micros();
+  for (i = 0; i < w; i += 6)
+  {
+    i2 = i / 2;
+    tft.drawRoundRect(cx - i2, cy - i2, i, i, i / 8, color565(i, 0, 0));
+  }
+
+  return micros() - start;
+}
+
+unsigned long testFilledRoundRects()
+{
+  unsigned long start;
+  int i, i2;
+  int cx = tft.width() / 2 - 1;
+  int cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(BLACK);
+  start = micros();
+  for (i = min(tft.width(), tft.height()); i > 20; i -= 6)
+  {
+    i2 = i / 2;
+    tft.fillRoundRect(cx - i2, cy - i2, i, i, i / 8, color565(0, i, 0));
+  }
+
+  return micros() - start;
+}
 
 void setup(void)
 {
@@ -308,22 +308,22 @@ void setup(void)
   //testFilledRects(YELLOW, MAGENTA);
   //delay(500);
 
-  testFilledCircles(10, MAGENTA);
+  //testFilledCircles(10, MAGENTA);
 
-  testCircles(10, WHITE);
-  delay(500);
-
-  testTriangles();
-  delay(500);
-
-  testFilledTriangles();
-  delay(500);
-
-  //testRoundRects();
+  //testCircles(10, WHITE);
   //delay(500);
 
-  //testFilledRoundRects();
+  //testTriangles();
   //delay(500);
+
+  //testFilledTriangles();
+  //delay(500);
+
+  testRoundRects();
+  delay(500);
+
+  testFilledRoundRects();
+  delay(500);
 }
 
 void loop(void)

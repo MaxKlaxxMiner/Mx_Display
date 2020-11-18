@@ -105,6 +105,16 @@ namespace SerialDisplay
       /// </summary>
       CmdFillTriangle,
       /// <summary>
+      /// draw a rounded rectangle with no fill color
+      /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
+      /// </summary>
+      CmdDrawRoundRect,
+      /// <summary>
+      /// draw a rounded rectangle with fill color
+      /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
+      /// </summary>
+      CmdFillRoundRect,
+      /// <summary>
       /// set display rotation (0-3)
       /// [uint8_t rotation]
       /// </summary>
@@ -142,6 +152,8 @@ namespace SerialDisplay
         case CmdAdafruitType.CmdFillCircle: return 1 + sizeof(ushort) * 4;
         case CmdAdafruitType.CmdDrawTriangle:
         case CmdAdafruitType.CmdFillTriangle: return 1 + sizeof(ushort) * 7;
+        case CmdAdafruitType.CmdDrawRoundRect:
+        case CmdAdafruitType.CmdFillRoundRect: return 1 + sizeof(ushort) * 6;
         case CmdAdafruitType.CmdSetRotation:
         case CmdAdafruitType.CmdSetBackBuffer:
         case CmdAdafruitType.CmdCopyToBackbuffer: return 1 + sizeof(byte);
@@ -594,6 +606,84 @@ namespace SerialDisplay
     }
 
     /// <summary>
+    /// quarter-circle drawer, used to do circles and roundrects
+    /// </summary>
+    /// <param name="ptr">pointer to the backbuffer</param>
+    /// <param name="x">center x-position</param>
+    /// <param name="y">center y-position</param>
+    /// <param name="r">radius</param>
+    /// <param name="corners">cornername mask to indicate which quarters of the circle we're doing</param>
+    /// <param name="color">border-color</param>
+    static void DrawCircleHelper(uint* ptr, int x, int y, int r, int corners, uint color)
+    {
+      if (currentRotation != 0)
+      {
+        if (currentRotation == 1)
+        {
+          int t = x;
+          x = Width - 1 - y;
+          y = t;
+          corners <<= 1;
+          corners |= corners >> 4;
+        }
+        else if (currentRotation == 2)
+        {
+          x = Width - 1 - x;
+          y = Height - 1 - y;
+          corners <<= 2;
+          corners |= corners >> 4;
+        }
+        else
+        {
+          int t = x;
+          x = y;
+          y = Height - 1 - t;
+          corners <<= 3;
+          corners |= corners >> 4;
+        }
+      }
+
+      int f = 1 - r;
+      int ddF_x = 1;
+      int ddF_y = -2 * r;
+      int px = 0;
+      int py = r;
+
+      while (px < py)
+      {
+        if (f >= 0)
+        {
+          py--;
+          ddF_y += 2;
+          f += ddF_y;
+        }
+        px++;
+        ddF_x += 2;
+        f += ddF_x;
+        if ((corners & 0x4) != 0)
+        {
+          if ((uint)(x + px) < Width && (uint)(y + py) < Height) ptr[x + px + (y + py) * Width] = color;
+          if ((uint)(x + py) < Width && (uint)(y + px) < Height) ptr[x + py + (y + px) * Width] = color;
+        }
+        if ((corners & 0x2) != 0)
+        {
+          if ((uint)(x + px) < Width && (uint)(y - py) < Height) ptr[x + px + (y - py) * Width] = color;
+          if ((uint)(x + py) < Width && (uint)(y - px) < Height) ptr[x + py + (y - px) * Width] = color;
+        }
+        if ((corners & 0x8) != 0)
+        {
+          if ((uint)(x - py) < Width && (uint)(y + px) < Height) ptr[x - py + (y + px) * Width] = color;
+          if ((uint)(x - px) < Width && (uint)(y + py) < Height) ptr[x - px + (y + py) * Width] = color;
+        }
+        if ((corners & 0x1) != 0)
+        {
+          if ((uint)(x - py) < Width && (uint)(y - px) < Height) ptr[x - py + (y - px) * Width] = color;
+          if ((uint)(x - px) < Width && (uint)(y - py) < Height) ptr[x - px + (y - py) * Width] = color;
+        }
+      }
+    }
+
+    /// <summary>
     /// quarter-circle drawer with fill, used for circles and roundrects
     /// </summary>
     /// <param name="ptr">pointer to the backbuffer</param>
@@ -876,6 +966,47 @@ namespace SerialDisplay
           uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 6));
           FillTriangle(p, x1, y1, x2, y2, x3, y3, color);
           return 1 + sizeof(ushort) * 7;
+        }
+
+        case CmdAdafruitType.CmdDrawRoundRect:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int w = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int h = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          int r = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 5));
+          int max_radius = ((w < h) ? w : h) / 2; // 1/2 minor axis
+          if (r > max_radius) r = max_radius;
+          // smarter version
+          FastHLine(p, x + r, y, w - 2 * r, color);         // Top
+          FastHLine(p, x + r, y + h - 1, w - 2 * r, color); // Bottom
+          FastVLine(p, x, y + r, h - 2 * r, color);         // Left
+          FastVLine(p, x + w - 1, y + r, h - 2 * r, color); // Right
+          // draw four corners
+          DrawCircleHelper(p, x + r, y + r, r, 1, color);
+          DrawCircleHelper(p, x + w - r - 1, y + r, r, 2, color);
+          DrawCircleHelper(p, x + w - r - 1, y + h - r - 1, r, 4, color);
+          DrawCircleHelper(p, x + r, y + h - r - 1, r, 8, color);
+          return 1 + sizeof(ushort) * 6;
+        }
+
+        case CmdAdafruitType.CmdFillRoundRect:
+        {
+          int x = BitConverter.ToInt16(buffer, bufferOfs);
+          int y = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int w = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int h = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          int r = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 5));
+          int max_radius = ((w < h) ? w : h) / 2; // 1/2 minor axis
+          if (r > max_radius) r = max_radius;
+          // smarter version
+          for (int i = 0; i < h; i++) FastHLine(p, x + r, y + i, w - 2 * r, color);
+          // draw four corners
+          FillCircleHelper(p, x + w - r - 1, y + r, r, 1, h - 2 * r - 1, color);
+          FillCircleHelper(p, x + r, y + r, r, 2, h - 2 * r - 1, color);
+          return 1 + sizeof(ushort) * 6;
         }
 
         case CmdAdafruitType.CmdSetRotation:

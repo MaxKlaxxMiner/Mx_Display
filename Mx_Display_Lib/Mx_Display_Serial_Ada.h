@@ -70,6 +70,16 @@ enum CmdAdafruitType
   /// </summary>
   CmdFillTriangle,
   /// <summary>
+  /// draw a rounded rectangle with no fill color
+  /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
+  /// </summary>
+  CmdDrawRoundRect,
+  /// <summary>
+  /// draw a rounded rectangle with fill color
+  /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
+  /// </summary>
+  CmdFillRoundRect,
+  /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
   /// </summary>
@@ -271,6 +281,34 @@ public:
   void fillTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
   {
     Cmd7w(CmdFillTriangle, x1, y1, x2, y2, x3, y3, color);
+  }
+
+  /// <summary>
+  /// draw a rounded rectangle with no fill color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">width</param>
+  /// <param name="h">height</param>
+  /// <param name="r">border-radius</param>
+  /// <param name="color">border-color</param>
+  void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+  {
+    Cmd6w(CmdDrawRoundRect, x, y, w, h, r, color);
+  }
+
+  /// <summary>
+  /// draw a rounded rectangle with fill color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">width</param>
+  /// <param name="h">height</param>
+  /// <param name="r">border-radius</param>
+  /// <param name="color">fill-color</param>
+  void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+  {
+    Cmd6w(CmdFillRoundRect, x, y, w, h, r, color);
   }
 
   /// <summary>

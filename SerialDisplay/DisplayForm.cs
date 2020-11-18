@@ -12,7 +12,7 @@ namespace SerialDisplay
 {
   public unsafe sealed partial class DisplayForm : Form
   {
-    const string DisplayPort = "COM7";
+    const string DisplayPort = "COM6";
 
     readonly SerialPort serialPort = new SerialPort(DisplayPort, 500000);
     static readonly Queue<byte[]> buffers = new Queue<byte[]>();
@@ -156,6 +156,7 @@ namespace SerialDisplay
         sizeY += DisplayCmd.Height;
       }
       SetClientSizeCore(sizeX, sizeY);
+      Top = 0;
     }
 
     private void DisplayForm_Resize(object sender, EventArgs e)
