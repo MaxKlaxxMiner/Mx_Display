@@ -27,33 +27,33 @@ unsigned long testFillScreen()
   return micros() - start;
 }
 
-//unsigned long testText()
-//{
-//  tft.fillScreen(BLACK);
-//  unsigned long start = micros();
-//  tft.setCursor(0, 0);
-//  tft.setTextColor(WHITE);  tft.setTextSize(1);
-//  tft.println("Hello World!");
-//  tft.setTextColor(YELLOW); tft.setTextSize(2);
-//  tft.println(1234.56);
-//  tft.setTextColor(RED);    tft.setTextSize(3);
-//  tft.println(0xDEADBEEF, HEX);
-//  tft.println();
-//  tft.setTextColor(GREEN);
-//  tft.setTextSize(5);
-//  tft.println("Groop");
-//  tft.setTextSize(2);
-//  tft.println("I implore thee,");
-//  tft.setTextSize(1);
-//  tft.println("my foonting turlingdromes.");
-//  tft.println("And hooptiously drangle me");
-//  tft.println("with crinkly bindlewurdles,");
-//  tft.println("Or I will rend thee");
-//  tft.println("in the gobberwarts");
-//  tft.println("with my blurglecruncheon,");
-//  tft.println("see if I don't!");
-//  return micros() - start;
-//}
+unsigned long testText()
+{
+  tft.fillScreen(BLACK);
+  unsigned long start = micros();
+  tft.setCursor(0, 0);
+  tft.setTextColor(WHITE);  tft.setTextSize(1);
+  tft.println("Hello World!");
+  tft.setTextColor(YELLOW); tft.setTextSize(2);
+  tft.println(1234.56);
+  tft.setTextColor(RED);    tft.setTextSize(3);
+  tft.println(0xDEADBEEF, HEX);
+  tft.println();
+  tft.setTextColor(GREEN);
+  tft.setTextSize(5);
+  tft.println("Groop");
+  tft.setTextSize(2);
+  tft.println("I implore thee,");
+  tft.setTextSize(1);
+  tft.println("my foonting turlingdromes.");
+  tft.println("And hooptiously drangle me");
+  tft.println("with crinkly bindlewurdles,");
+  tft.println("Or I will rend thee");
+  tft.println("in the gobberwarts");
+  tft.println("with my blurglecruncheon,");
+  tft.println("see if I don't!");
+  return micros() - start;
+}
 
 unsigned long testLines(uint16_t color)
 {
@@ -293,8 +293,8 @@ void setup(void)
   //testFillScreen();
   //delay(500);
 
-  //testText();
-  //delay(3000);
+  testText();
+  delay(3000);
 
   //testLines(CYAN);
   //delay(500);
@@ -319,11 +319,11 @@ void setup(void)
   //testFilledTriangles();
   //delay(500);
 
-  testRoundRects();
-  delay(500);
+  //testRoundRects();
+  //delay(500);
 
-  testFilledRoundRects();
-  delay(500);
+  //testFilledRoundRects();
+  //delay(500);
 }
 
 void loop(void)

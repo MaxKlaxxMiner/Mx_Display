@@ -95,16 +95,6 @@ namespace SerialDisplay
       /// </summary>
       CmdFillCircle,
       /// <summary>
-      /// draw a triangle with no fill color
-      /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
-      /// </summary>
-      CmdDrawTriangle,
-      /// <summary>
-      /// draw a triangle with filled color
-      /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
-      /// </summary>
-      CmdFillTriangle,
-      /// <summary>
       /// draw a rounded rectangle with no fill color
       /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
       /// </summary>
@@ -114,6 +104,16 @@ namespace SerialDisplay
       /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
       /// </summary>
       CmdFillRoundRect,
+      /// <summary>
+      /// draw a triangle with no fill color
+      /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+      /// </summary>
+      CmdDrawTriangle,
+      /// <summary>
+      /// draw a triangle with filled color
+      /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+      /// </summary>
+      CmdFillTriangle,
       /// <summary>
       /// set display rotation (0-3)
       /// [uint8_t rotation]
@@ -150,10 +150,10 @@ namespace SerialDisplay
         case CmdAdafruitType.CmdFillRect: return 1 + sizeof(ushort) * 5;
         case CmdAdafruitType.CmdDrawCircle:
         case CmdAdafruitType.CmdFillCircle: return 1 + sizeof(ushort) * 4;
-        case CmdAdafruitType.CmdDrawTriangle:
-        case CmdAdafruitType.CmdFillTriangle: return 1 + sizeof(ushort) * 7;
         case CmdAdafruitType.CmdDrawRoundRect:
         case CmdAdafruitType.CmdFillRoundRect: return 1 + sizeof(ushort) * 6;
+        case CmdAdafruitType.CmdDrawTriangle:
+        case CmdAdafruitType.CmdFillTriangle: return 1 + sizeof(ushort) * 7;
         case CmdAdafruitType.CmdSetRotation:
         case CmdAdafruitType.CmdSetBackBuffer:
         case CmdAdafruitType.CmdCopyToBackbuffer: return 1 + sizeof(byte);
@@ -940,34 +940,6 @@ namespace SerialDisplay
           return 1 + sizeof(ushort) * 4;
         }
 
-        case CmdAdafruitType.CmdDrawTriangle:
-        {
-          int x1 = BitConverter.ToInt16(buffer, bufferOfs);
-          int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
-          int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
-          int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
-          int x3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
-          int y3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 5);
-          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 6));
-          DrawLine(p, x1, y1, x2, y2, color);
-          DrawLine(p, x2, y2, x3, y3, color);
-          DrawLine(p, x3, y3, x1, y1, color);
-          return 1 + sizeof(ushort) * 7;
-        }
-
-        case CmdAdafruitType.CmdFillTriangle:
-        {
-          int x1 = BitConverter.ToInt16(buffer, bufferOfs);
-          int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
-          int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
-          int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
-          int x3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
-          int y3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 5);
-          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 6));
-          FillTriangle(p, x1, y1, x2, y2, x3, y3, color);
-          return 1 + sizeof(ushort) * 7;
-        }
-
         case CmdAdafruitType.CmdDrawRoundRect:
         {
           int x = BitConverter.ToInt16(buffer, bufferOfs);
@@ -1007,6 +979,34 @@ namespace SerialDisplay
           FillCircleHelper(p, x + w - r - 1, y + r, r, 1, h - 2 * r - 1, color);
           FillCircleHelper(p, x + r, y + r, r, 2, h - 2 * r - 1, color);
           return 1 + sizeof(ushort) * 6;
+        }
+
+        case CmdAdafruitType.CmdDrawTriangle:
+        {
+          int x1 = BitConverter.ToInt16(buffer, bufferOfs);
+          int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          int x3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
+          int y3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 5);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 6));
+          DrawLine(p, x1, y1, x2, y2, color);
+          DrawLine(p, x2, y2, x3, y3, color);
+          DrawLine(p, x3, y3, x1, y1, color);
+          return 1 + sizeof(ushort) * 7;
+        }
+
+        case CmdAdafruitType.CmdFillTriangle:
+        {
+          int x1 = BitConverter.ToInt16(buffer, bufferOfs);
+          int y1 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short));
+          int x2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 2);
+          int y2 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 3);
+          int x3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 4);
+          int y3 = BitConverter.ToInt16(buffer, bufferOfs + sizeof(short) * 5);
+          uint color = Color565ToArgb(BitConverter.ToUInt16(buffer, bufferOfs + sizeof(short) * 6));
+          FillTriangle(p, x1, y1, x2, y2, x3, y3, color);
+          return 1 + sizeof(ushort) * 7;
         }
 
         case CmdAdafruitType.CmdSetRotation:

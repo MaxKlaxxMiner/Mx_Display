@@ -12,7 +12,7 @@ namespace SerialDisplay
 {
   public unsafe sealed partial class DisplayForm : Form
   {
-    const string DisplayPort = "COM6";
+    const string DisplayPort = "COM3";
 
     readonly SerialPort serialPort = new SerialPort(DisplayPort, 500000);
     static readonly Queue<byte[]> buffers = new Queue<byte[]>();

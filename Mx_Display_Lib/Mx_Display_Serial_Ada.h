@@ -60,16 +60,6 @@ enum CmdAdafruitType
   /// </summary>
   CmdFillCircle,
   /// <summary>
-  /// draw a triangle with no fill color
-  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
-  /// </summary>
-  CmdDrawTriangle,
-  /// <summary>
-  /// draw a triangle with filled color
-  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
-  /// </summary>
-  CmdFillTriangle,
-  /// <summary>
   /// draw a rounded rectangle with no fill color
   /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
   /// </summary>
@@ -79,6 +69,16 @@ enum CmdAdafruitType
   /// [int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color]
   /// </summary>
   CmdFillRoundRect,
+  /// <summary>
+  /// draw a triangle with no fill color
+  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+  /// </summary>
+  CmdDrawTriangle,
+  /// <summary>
+  /// draw a triangle with filled color
+  /// [int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color]
+  /// </summary>
+  CmdFillTriangle,
   /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
@@ -97,7 +97,6 @@ enum CmdAdafruitType
 };
 
 #define DisplaySerialPort Serial
-//#define DisplaySerialName tft;
 #define DisplayWidth 320
 #define DisplayHeight 240
 
@@ -111,6 +110,8 @@ enum CmdAdafruitType
 #define Cmd5w(cmd, val1, val2, val3, val4, val5) Cmd4w(cmd, val1, val2, val3, val4); Val1w(val5);
 #define Cmd6w(cmd, val1, val2, val3, val4, val5, val6) Cmd5w(cmd, val1, val2, val3, val4, val5); Val1w(val6);
 #define Cmd7w(cmd, val1, val2, val3, val4, val5, val6, val7) Cmd6w(cmd, val1, val2, val3, val4, val5, val6); Val1w(val7);
+
+#define Mx_Print_Inherit
 
 #ifdef Mx_Display_Reference
 class Mx_Display_Serial_Adafruit : public Adafruit_GFX
@@ -137,6 +138,9 @@ public:
 };
 #else
 class Mx_Display_Serial_Adafruit
+#ifdef Mx_Print_Inherit
+  : public Print
+#endif
 {
 public:
   /// <summary>
@@ -254,6 +258,34 @@ public:
   }
 
   /// <summary>
+  /// draw a rounded rectangle with no fill color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">width</param>
+  /// <param name="h">height</param>
+  /// <param name="r">border-radius</param>
+  /// <param name="color">border-color</param>
+  void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+  {
+    Cmd6w(CmdDrawRoundRect, x, y, w, h, r, color);
+  }
+
+  /// <summary>
+  /// draw a rounded rectangle with fill color
+  /// </summary>
+  /// <param name="x">start x-position</param>
+  /// <param name="y">start y-position</param>
+  /// <param name="w">width</param>
+  /// <param name="h">height</param>
+  /// <param name="r">border-radius</param>
+  /// <param name="color">fill-color</param>
+  void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+  {
+    Cmd6w(CmdFillRoundRect, x, y, w, h, r, color);
+  }
+
+  /// <summary>
   /// draw a triangle with no fill color
   /// </summary>
   /// <param name="x1">first vertex x-position</param>
@@ -281,34 +313,6 @@ public:
   void fillTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
   {
     Cmd7w(CmdFillTriangle, x1, y1, x2, y2, x3, y3, color);
-  }
-
-  /// <summary>
-  /// draw a rounded rectangle with no fill color
-  /// </summary>
-  /// <param name="x">start x-position</param>
-  /// <param name="y">start y-position</param>
-  /// <param name="w">width</param>
-  /// <param name="h">height</param>
-  /// <param name="r">border-radius</param>
-  /// <param name="color">border-color</param>
-  void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
-  {
-    Cmd6w(CmdDrawRoundRect, x, y, w, h, r, color);
-  }
-
-  /// <summary>
-  /// draw a rounded rectangle with fill color
-  /// </summary>
-  /// <param name="x">start x-position</param>
-  /// <param name="y">start y-position</param>
-  /// <param name="w">width</param>
-  /// <param name="h">height</param>
-  /// <param name="r">border-radius</param>
-  /// <param name="color">fill-color</param>
-  void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
-  {
-    Cmd6w(CmdFillRoundRect, x, y, w, h, r, color);
   }
 
   /// <summary>
@@ -357,7 +361,6 @@ private:
 #ifdef Mx_Display_Reference
 Mx_Display_Serial_Adafruit tft(0);
 #else
-//Mx_Display_Serial_Adafruit DisplaySerialName;
 Mx_Display_Serial_Adafruit tft;
 #endif
 
