@@ -80,6 +80,31 @@ enum CmdAdafruitType
   /// </summary>
   CmdFillTriangle,
   /// <summary>
+  /// set text cursor location
+  /// [int16_t x, int16_t y]
+  /// </summary>
+  CmdSetCursor,
+  /// <summary>
+  /// set text font color and background color (color = bgColor: transparent background)
+  /// [uint16_t color, uint16_t bgColor]
+  /// </summary>
+  CmdSetTextColor,
+  /// <summary>
+  /// set text size
+  /// [uint8_t sizeX, uint8_t sizeY]
+  /// </summary>
+  CmdSetTextSize,
+  /// <summary>
+  /// set whether text that is too long for the screen width should automatically wrap around to the next line (else clip right).
+  /// [bool wrap]
+  /// </summary>
+  CmdSetTextWrap,
+  /// <summary>
+  /// write a character
+  /// [uint8_t character]
+  /// </summary>
+  CmdWriteChar,
+  /// <summary>
   /// set display rotation (0-3)
   /// [uint8_t rotation]
   /// </summary>
@@ -102,6 +127,7 @@ enum CmdAdafruitType
 
 #define Cmd(cmd) DisplaySerialPort.write((uint8_t)(cmd));
 #define Cmd1b(cmd, val1) Cmd(cmd); DisplaySerialPort.write((uint8_t)(val1));
+#define Cmd2b(cmd, val1, val2) Cmd1b(cmd, val1); DisplaySerialPort.write((uint8_t)(val2));
 #define Val1w(val) DisplaySerialPort.write((uint8_t)(val)); DisplaySerialPort.write((uint8_t)((val) >> 8));
 #define Cmd1w(cmd, val1) Cmd(cmd); Val1w(val1);
 #define Cmd2w(cmd, val1, val2) Cmd1w(cmd, val1); Val1w(val2);
@@ -123,6 +149,13 @@ public:
 
   void drawPixel(int16_t x, int16_t y, uint16_t color)
   {
+    int16_t t;
+    switch (rotation)
+    {
+      case 1: t = x; x = DisplayWidth - 1 - y; y = t; break;
+      case 2: x = DisplayWidth - 1 - x; y = DisplayHeight - 1 - y; break;
+      case 3: t = x; x = y; y = DisplayHeight - 1 - t; break;
+    }
     Cmd3w(CmdDrawPixel, x, y, color);
   }
 
@@ -134,6 +167,27 @@ public:
   void copyToBackbuffer(uint8_t b)
   {
     Cmd1b(CmdCopyToBackbuffer, b);
+  }
+
+  void writeLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+  {
+    int16_t t;
+    switch (rotation)
+    {
+      case 1:
+        t = x1; x1 = DisplayWidth - 1 - y1; y1 = t;
+        t = x2; x2 = DisplayWidth - 1 - y2; y2 = t;
+        break;
+      case 2:
+        x1 = DisplayWidth - 1 - x1; y1 = DisplayHeight - 1 - y1;
+        x2 = DisplayWidth - 1 - x2; y2 = DisplayHeight - 1 - y2;
+        break;
+      case 3:
+        t = x1; x1 = y1; y1 = DisplayHeight - 1 - t;
+        t = x2; x2 = y2; y2 = DisplayHeight - 1 - t;
+        break;
+    }
+    Cmd5w(CmdDrawLine, x1, y1, x2, y2, color);
   }
 };
 #else
@@ -313,6 +367,73 @@ public:
   void fillTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
   {
     Cmd7w(CmdFillTriangle, x1, y1, x2, y2, x3, y3, color);
+  }
+
+  /// <summary>
+  /// set text font color with transparant background
+  /// </summary>
+  /// <param name="color">text-color</param>
+  void setTextColor(uint16_t color)
+  {
+    Cmd2w(CmdSetTextColor, color, color);
+  }
+
+  /// <summary>
+  /// set text cursor location
+  /// </summary>
+  /// <param name="x">cursor-x in pixels</param>
+  /// <param name="y">cursor-y in pixels</param>
+  void setCursor(int16_t x, int16_t y)
+  {
+    Cmd2w(CmdSetCursor, x, y);
+  }
+
+  /// <summary>
+  /// set text font color with custom background color
+  /// </summary>
+  /// <param name="color">text-color</param>
+  /// <param name="bgColor">background fill-color</param>
+  void setTextColor(uint16_t color, uint16_t bgColor)
+  {
+    Cmd2w(CmdSetTextColor, color, bgColor);
+  }
+
+  /// <summary>
+  /// set text 'magnification' size. Each increase in s makes 1 pixel that much bigger.
+  /// </summary>
+  /// <param name="size">desired text size. 1 is default 6x8, 2 is 12x16, 3 is 18x24, etc</param>
+  void setTextSize(uint8_t size)
+  {
+    Cmd2b(CmdSetTextSize, size, size);
+  }
+
+  /// <summary>
+  /// set text 'magnification' size. Each increase in s makes 1 pixel that much bigger.
+  /// </summary>
+  /// <param name="sizeX">desired text width magnification level in X-axis. 1 is default</param>
+  /// <param name="sizeY">desired text width magnification level in Y-axis. 1 is default</param>
+  void setTextSize(uint8_t sizeX, uint8_t sizeY) 
+  {
+    Cmd2b(CmdSetTextSize, sizeX, sizeY);
+  }
+
+  /// <summary>
+  /// set whether text that is too long for the screen width should automatically wrap around to the next line (else clip right).
+  /// </summary>
+  /// <param name="wrap">true for wrapping, false for clipping</param>
+  void setTextWrap(bool wrap)
+  {
+    Cmd1b(CmdSetTextWrap, wrap);
+  }
+
+  /// <summary>
+  /// print one byte/character of data, used to support print()
+  /// </summary>
+  /// <param name="charactar">the 8-bit ascii character to write</param>
+  size_t write(uint8_t charactar)
+  {
+    Cmd1b(CmdWriteChar, charactar);
+    return 1;
   }
 
   /// <summary>

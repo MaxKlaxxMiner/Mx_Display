@@ -17,7 +17,7 @@ namespace SerialDisplay
 
     public int color565(int r, int g, int b) { return (((r) & 0xF8) << 8 | ((g) & 0xFC) << 3 | (b&0xff) >> 3); }
 
-    const string DisplayPort = "COM2";
+    const string DisplayPort = "COM12";
 
     readonly SerialPort serialPort = new SerialPort(DisplayPort, 500000);
     static readonly Queue<byte[]> buffers = new Queue<byte[]>();
